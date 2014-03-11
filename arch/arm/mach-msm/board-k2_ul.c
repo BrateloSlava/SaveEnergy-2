@@ -202,8 +202,6 @@ static int __init pmem_kernel_ebi1_size_setup(char *p)
 early_param("pmem_kernel_ebi1_size", pmem_kernel_ebi1_size_setup);
 #endif
 
-static unsigned int engineerid;
-
 #ifdef CONFIG_ANDROID_PMEM
 static unsigned pmem_size = MSM_PMEM_SIZE;
 static int __init pmem_size_setup(char *p)
@@ -511,9 +509,9 @@ static void __init reserve_ion_memory(void)
 			reusable_count += (data->reusable) ? 1 : 0;
 
 			if (data->reusable && reusable_count > 1) {
-				pr_err("%s: Too many heaps specified as "
+				/*pr_err("%s: Too many heaps specified as "
 					"reusable. Heap %s was not configured "
-					"as reusable.\n", __func__, heap->name);
+					"as reusable.\n", __func__, heap->name);*/
 				data->reusable = 0;
 			}
 		}
@@ -673,10 +671,10 @@ static void __init locate_unstable_memory(void)
 	msm8930_reserve_info.low_unstable_address = mb->start -
 					MIN_MEMORY_BLOCK_SIZE + mb->size;
 	msm8930_reserve_info.max_unstable_size = MIN_MEMORY_BLOCK_SIZE;
-	pr_info("low unstable address %lx max size %lx bank size %lx\n",
+	/*pr_info("low unstable address %lx max size %lx bank size %lx\n",
 		msm8930_reserve_info.low_unstable_address,
 		msm8930_reserve_info.max_unstable_size,
-		msm8930_reserve_info.bank_size);
+		msm8930_reserve_info.bank_size);*/
 	return;
 #endif
 no_dmm:
@@ -689,8 +687,8 @@ static void __init place_movable_zone(void)
 #ifdef CONFIG_ENABLE_DMM
 	movable_reserved_start = msm8930_reserve_info.low_unstable_address;
 	movable_reserved_size = msm8930_reserve_info.max_unstable_size;
-	pr_info("movable zone start %lx size %lx\n",
-		movable_reserved_start, movable_reserved_size);
+	/*pr_info("movable zone start %lx size %lx\n",
+		movable_reserved_start, movable_reserved_size);*/
 #endif
 }
 
@@ -709,10 +707,12 @@ static void __init k2_ul_reserve(void)
 		if (reserve_info->fixed_area_size) {
 			msm8930_fmem_pdata.phys =
 				reserve_info->fixed_area_start + MSM_MM_FW_SIZE;
+                /*
 		pr_info("mm fw at %lx (fixed) size %x\n",
 			reserve_info->fixed_area_start, MSM_MM_FW_SIZE);
 		pr_info("fmem start %lx (fixed) size %lx\n",
 			msm8930_fmem_pdata.phys, msm8930_fmem_pdata.size);
+                */
 		}
 #endif
 	}
@@ -865,41 +865,41 @@ static struct pc_temp_ocv_lut  pc_temp_ocv_id_1 = {
 };
 
 static struct sf_lut rbatt_sf_id_1 = {
-        .rows           = 28,
-        .cols           = 6,
-        
-        .row_entries = {-20, -10, 0, 25, 40, 60},
-        .percent        = {100, 95, 90, 85, 80, 75, 70, 65, 60, 55, 50, 45, 40, 35, 30, 25, 20, 15, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1},
-        .sf                 = {
-					{240,170,150,135,135,130},
-					{240,170,150,135,135,130},
-					{240,170,150,135,135,130},
-					{240,170,150,135,135,130},
-					{240,170,150,135,135,130},
-					{240,170,150,135,135,130},
-					{240,170,150,135,135,130},
-					{240,170,150,135,135,130},
-					{240,170,150,135,135,130},
-					{240,170,150,135,135,130},
-					{240,170,150,135,135,130},
-					{240,170,150,135,135,130},
-					{240,170,150,135,135,130},
-					{240,170,150,135,135,130},
-					{240,170,150,135,135,130},
-					{240,170,150,135,135,130},
-					{240,170,150,135,135,130},
-					{240,170,150,135,135,130},
-					{240,170,150,135,135,130},
-					{240,170,150,135,135,130},
-					{240,170,150,135,135,130},
-					{240,170,150,135,135,130},
-					{240,170,150,135,135,130},
-					{240,170,150,135,135,130},
-					{240,170,150,135,135,130},
-					{240,170,150,135,135,130},
-					{240,170,150,135,135,130},
-					{240,170,150,135,135,130},
-			}
+	.rows		= 28,
+	.cols			= 6,
+	
+	.row_entries = {-20, -10, 0, 25, 40, 60},
+	.percent		= {100, 95, 90, 85, 80, 75, 70, 65, 60, 55, 50, 45, 40, 35, 30, 25, 20, 15, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1},
+	.sf 			= {
+				{240,170,150,135,135,130},
+				{240,170,150,135,135,130},
+				{240,170,150,135,135,130},
+				{240,170,150,135,135,130},
+				{240,170,150,135,135,130},
+				{240,170,150,135,135,130},
+				{240,170,150,135,135,130},
+				{240,170,150,135,135,130},
+				{240,170,150,135,135,130},
+				{240,170,150,135,135,130},
+				{240,170,150,135,135,130},
+				{240,170,150,135,135,130},
+				{240,170,150,135,135,130},
+				{240,170,150,135,135,130},
+				{240,170,150,135,135,130},
+				{240,170,150,135,135,130},
+				{240,170,150,135,135,130},
+				{240,170,150,135,135,130},
+				{240,170,150,135,135,130},
+				{240,170,150,135,135,130},
+				{240,170,150,135,135,130},
+				{240,170,150,135,135,130},
+				{240,170,150,135,135,130},
+				{240,170,150,135,135,130},
+				{240,170,150,135,135,130},
+				{240,170,150,135,135,130},
+				{240,170,150,135,135,130},
+				{240,170,150,135,135,130},
+		}
 };
 
 
@@ -1446,12 +1446,12 @@ int64_t k2_ul_get_usbid_adc(void)
 
 	err = pm8xxx_adc_mpp_config_read(PM8XXX_AMUX_MPP_3, ADC_MPP_1_AMUX6, &result);
 	if (err) {
-		pr_info("[CABLE] %s: get adc fail, err %d\n", __func__, err);
+		//pr_info("[CABLE] %s: get adc fail, err %d\n", __func__, err);
 		return err;
 	}
-	pr_info("[CABLE] chan=%d, adc_code=%d, measurement=%lld, \
+	/*pr_info("[CABLE] chan=%d, adc_code=%d, measurement=%lld, \
 			physical=%lld\n", result.chan, result.adc_code,
-			result.measurement, result.physical);
+			result.measurement, result.physical);*/
 	adc = result.physical;
 	return adc/1000;
 }
@@ -1474,10 +1474,10 @@ void config_k2_ul_usb_id_gpios(bool output)
 	if (output) {
 		gpio_tlmm_config(usb_ID_PIN_ouput_table[0], GPIO_CFG_ENABLE);
 		gpio_set_value(MSM_USB_ID1, 1);
-		pr_info("[CABLE] %s: %d output high\n",  __func__, MSM_USB_ID1);
+		//pr_info("[CABLE] %s: %d output high\n",  __func__, MSM_USB_ID1);
 	} else {
 		gpio_tlmm_config(usb_ID_PIN_input_table[0], GPIO_CFG_ENABLE);
-		pr_info("[CABLE] %s: %d input none pull\n",  __func__, MSM_USB_ID1);
+		//pr_info("[CABLE] %s: %d input none pull\n",  __func__, MSM_USB_ID1);
 	}
 }
 
@@ -1504,8 +1504,8 @@ void k2ul_cable_detect_register(void)
 
 void pm8xxx_adc_device_driver_register(void)
 {
-	pr_info("%s: Register PM8XXX ADC device. rev: %d\n",
-		__func__, system_rev);
+	/*pr_info("%s: Register PM8XXX ADC device. rev: %d\n",
+		__func__, system_rev);*/
 	k2ul_cable_detect_register();
 }
 
@@ -1635,7 +1635,7 @@ static void __init k2_ul_map_io(void)
 	msm_map_msm8930_io();
 
 	if (socinfo_init() < 0)
-		pr_err("socinfo_init() failed!\n");
+		/*pr_err("socinfo_init() failed!\n")*/;
 }
 
 static void __init k2_ul_init_irq(void)
@@ -1661,7 +1661,7 @@ static int capella_pl_sensor_lpm_power(uint8_t enable)
 	if (pl_reg_l9 == NULL) {
 		pl_reg_l9 = regulator_get(NULL, "8038_l9");
 		if (IS_ERR(pl_reg_l9)) {
-			pr_err("[PS][cm3629] %s: Unable to get '8038_l9' \n", __func__);
+			//pr_err("[PS][cm3629] %s: Unable to get '8038_l9' \n", __func__);
 			mutex_unlock(&sensor_lock);
 			return -ENODEV;
 		}
@@ -1669,15 +1669,15 @@ static int capella_pl_sensor_lpm_power(uint8_t enable)
 	if (enable == 1) {
 		rc = regulator_set_optimum_mode(pl_reg_l9, 100);
 		if (rc < 0)
-			pr_err("[PS][cm3629] %s: enter lmp,set_optimum_mode l6 failed, rc=%d\n", __func__, rc);
+			/*pr_err("[PS][cm3629] %s: enter lmp,set_optimum_mode l6 failed, rc=%d\n", __func__, rc)*/;
 		else
-			pr_info("[PS][cm3629] %s: enter lmp,OK\n", __func__);
+			/*pr_info("[PS][cm3629] %s: enter lmp,OK\n", __func__)*/;
 	} else {
 		rc = regulator_set_optimum_mode(pl_reg_l9, 100000);
 		if (rc < 0)
-			pr_err("[PS][cm3629] %s: leave lmp,set_optimum_mode l6 failed, rc=%d\n", __func__, rc);
+			/*pr_err("[PS][cm3629] %s: leave lmp,set_optimum_mode l6 failed, rc=%d\n", __func__, rc)*/;
 		else
-			pr_info("[PS][cm3629] %s: leave lmp,OK\n", __func__);
+			/*pr_info("[PS][cm3629] %s: leave lmp,OK\n", __func__)*/;
 		msleep(10);
 	}
 	mutex_unlock(&sensor_lock);
@@ -1692,7 +1692,7 @@ static int cm3629_power(int ls_or_ps, uint8_t enable)
 	if (pl_reg_l9 == NULL) {
 		pl_reg_l9 = regulator_get(NULL, "8038_l9");
 		if (IS_ERR(pl_reg_l9)) {
-			pr_err("[PS][cm3629] %s: Unable to get '8038_l9' \n", __func__);
+			//pr_err("[PS][cm3629] %s: Unable to get '8038_l9' \n", __func__);
 			mutex_unlock(&sensor_lock);
 			return -ENODEV;
 		}
@@ -1700,13 +1700,13 @@ static int cm3629_power(int ls_or_ps, uint8_t enable)
 	if (enable == 1) {
 		rc = regulator_set_voltage(pl_reg_l9, 2850000, 2850000);
 		if (rc)
-			pr_err("[PS][cm3629] %s: unable to regulator_set_voltage, rc:%d\n", __func__, rc);
+			/*pr_err("[PS][cm3629] %s: unable to regulator_set_voltage, rc:%d\n", __func__, rc)*/;
 
 		rc = regulator_enable(pl_reg_l9);
 		if (rc)
-			pr_err("[PS][cm3629]'%s' regulator enable L9 failed, rc=%d\n", __func__,rc);
+			/*pr_err("[PS][cm3629]'%s' regulator enable L9 failed, rc=%d\n", __func__,rc)*/;
 		else
-			pr_info("[PS][cm3629]'%s' L9 power on\n", __func__);
+			/*pr_info("[PS][cm3629]'%s' L9 power on\n", __func__)*/;
 	}
 	mutex_unlock(&sensor_lock);
 	return rc;
@@ -1856,13 +1856,13 @@ static int usb_diag_update_pid_and_serial_num(uint32_t pid, const char *snum)
 
 	dload = ioremap(DLOAD_USB_BASE_ADD, sizeof(*dload));
 	if (!dload) {
-		pr_err("%s: cannot remap I/O memory region: %08x\n",
-					__func__, DLOAD_USB_BASE_ADD);
+		/*pr_err("%s: cannot remap I/O memory region: %08x\n",
+					__func__, DLOAD_USB_BASE_ADD);*/
 		return -ENXIO;
 	}
 
-	pr_debug("%s: dload:%p pid:%x serial_num:%s\n",
-				__func__, dload, pid, snum);
+	/*pr_debug("%s: dload:%p pid:%x serial_num:%s\n",
+				__func__, dload, pid, snum);*/
 	
 	dload->magic_struct.pid = PID_MAGIC_ID;
 	dload->pid = pid;
@@ -1909,7 +1909,7 @@ static struct platform_device android_usb_device = {
 
 void k2_ul_add_usb_devices(void)
 {
-	printk(KERN_INFO "[USB] %s rev: %d\n", __func__, system_rev);
+	//printk(KERN_INFO "[USB] %s rev: %d\n", __func__, system_rev);
 
 	gpio_tlmm_config(usb_ID_otg_PIN_table[0], GPIO_CFG_ENABLE);
 
@@ -1934,8 +1934,8 @@ void k2_ul_add_usb_devices(void)
 	platform_device_register(&msm8960_device_gadget_peripheral);
 	platform_device_register(&android_usb_device);
 
-	printk(KERN_INFO "[USB] %s: OTG_PMIC_CONTROL in rev: %d\n",
-			__func__, system_rev);
+	/*printk(KERN_INFO "[USB] %s: OTG_PMIC_CONTROL in rev: %d\n",
+			__func__, system_rev);*/
 }
 
 
@@ -2121,87 +2121,10 @@ static void syn_init_vkeys_k2(void)
 	if (syn_properties_kobj)
 		rc = sysfs_create_group(syn_properties_kobj, &syn_properties_attr_group);
 	if (!syn_properties_kobj || rc)
-		pr_err("%s: failed to create board_properties\n", __func__);
+		/*pr_err("%s: failed to create board_properties\n", __func__)*/;
 
 	return;
 }
-
-static struct synaptics_i2c_rmi_platform_data syn_ts_3k_data_apl[] = {
-	{
-		.packrat_number  = 1293984,
-		.abs_x_min       = 0,
-		.abs_x_max       = 1100,
-		.abs_y_min       = 0,
-		.abs_y_max       = 1740,
-		.display_width   = 480,
-		.display_height  = 800,
-		.gpio_irq        = MSM_TP_ATTz,
-		.gpio_reset      = MSM_TP_RSTz,
-		.default_config  = 1,
-		.tw_pin_mask     = 0x0080,
-		.report_type     = SYN_AND_REPORT_TYPE_B,
-		.psensor_detection = 1,
-		.reduce_report_level = {65, 65, 50, 0, 0},
-		.config = {
-			0x33, 0x30, 0x00, 0x08, 0x80, 0x7F, 0x03, 0x1E,
-			0x05, 0x09, 0x00, 0x01, 0x01, 0x00, 0x10, 0x4C,
-			0x04, 0x6C, 0x07, 0x02, 0x14, 0x1E, 0x05, 0x4B,
-			0x4E, 0x1C, 0xAA, 0x02, 0x01, 0x3C, 0x22, 0x02,
-			0x25, 0x02, 0xE1, 0x56, 0x00, 0x54, 0xE0, 0xAB,
-			0xE0, 0xAB, 0x00, 0xE0, 0x00, 0x00, 0x00, 0x00,
-			0x09, 0x04, 0xAE, 0x00, 0x00, 0x00, 0x00, 0x00,
-			0x00, 0x19, 0x01, 0x00, 0x0A, 0x0B, 0x13, 0x0A,
-			0x00, 0x14, 0x0A, 0x40, 0x64, 0x07, 0xF4, 0x96,
-			0xD2, 0x43, 0x2A, 0x05, 0x00, 0x00, 0x00, 0x00,
-			0x4C, 0x6C, 0x74, 0x3C, 0x32, 0x00, 0x00, 0x00,
-			0x4C, 0x6C, 0x74, 0x1E, 0x05, 0x00, 0x02, 0x2C,
-			0x01, 0x80, 0x03, 0x0E, 0x1F, 0x13, 0x41, 0x00,
-			0x13, 0x04, 0x1B, 0x00, 0x10, 0x00, 0xA0, 0xA0,
-			0x80, 0x80, 0x88, 0x80, 0x80, 0x68, 0x3F, 0x3D,
-			0x3B, 0x3A, 0x38, 0x36, 0x34, 0x33, 0x00, 0x00,
-			0x00, 0x00, 0x00, 0x00, 0x02, 0x04, 0x00, 0x88,
-			0x13, 0x00, 0x64, 0x00, 0xC8, 0x00, 0x80, 0x0A,
-			0x80, 0xB8, 0x0B, 0x00, 0xC0, 0x80, 0x02, 0x02,
-			0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x20, 0x20,
-			0x20, 0x20, 0x20, 0x10, 0x10, 0x10, 0x61, 0x65,
-			0x68, 0x6B, 0x6E, 0x39, 0x3B, 0x3D, 0x00, 0x8C,
-			0x00, 0x10, 0x28, 0x00, 0x00, 0x00, 0x03, 0x06,
-			0x09, 0x0C, 0x10, 0x12, 0x14, 0x00, 0x31, 0x04,
-			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-			0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF,
-			0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-			0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x51, 0x51, 0x51,
-			0x51, 0x51, 0x51, 0x51, 0x51, 0xCD, 0x0D, 0x04,
-			0x01, 0x17, 0x15, 0x18, 0x16, 0x19, 0x13, 0x1B,
-			0x12, 0x1A, 0x14, 0x11, 0xFF, 0xFF, 0xFF, 0x09,
-			0x0F, 0x08, 0x0A, 0x0D, 0x11, 0x13, 0x10, 0x01,
-			0x0C, 0x04, 0x05, 0x12, 0x0B, 0x0E, 0x07, 0x06,
-			0x02, 0x03, 0xFF, 0x00, 0x10, 0x00, 0x10, 0x00,
-			0x10, 0x00, 0x10, 0x80, 0x80, 0x80, 0x80, 0x80,
-			0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-			0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-			0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
-			0x80, 0x80, 0x80, 0x80, 0x80, 0x00, 0x0A, 0x00,
-			0x4F, 0x53,
-		},
-	},
-	{
-		.packrat_number = 7788,
-		.abs_x_min = 0,
-		.abs_x_max = 1100,
-		.abs_y_min = 0,
-		.abs_y_max = 1770,
-		.display_width   = 480,
-		.display_height  = 800,
-		.flags = SYNAPTICS_FLIP_X,
-		.gpio_irq = MSM_TP_ATTz,
-		.default_config = 2,
-		.large_obj_check = 1,
-		.tw_pin_mask = 0x0080,
-		.report_type = SYN_AND_REPORT_TYPE_B,
-		.segmentation_bef_unlock = 0x50,
-	},
-};
 
 static struct synaptics_i2c_rmi_platform_data syn_ts_3k_data[] = {
 	{
@@ -2568,26 +2491,26 @@ static void headset_init(void)
 	}
 	ret = gpio_request(MSM_V_HSMIC_2V85_EN, "headset_mic_bias");
 	if (ret) {
-		pr_err("[HS_BOARD]gpio_request for %d gpio failed rc(%d)\n", MSM_V_HSMIC_2V85_EN, ret);
+		//pr_err("[HS_BOARD]gpio_request for %d gpio failed rc(%d)\n", MSM_V_HSMIC_2V85_EN, ret);
 		return;
 	}
 
 	ret = gpio_direction_output(MSM_V_HSMIC_2V85_EN, 0);
 	if (ret) {
-		pr_err("[HS_BOARD]gpio_direction_output failed for %d gpio rc(%d)\n",MSM_V_HSMIC_2V85_EN, ret);
+		//pr_err("[HS_BOARD]gpio_direction_output failed for %d gpio rc(%d)\n",MSM_V_HSMIC_2V85_EN, ret);
 		return;
 	}
 	gpio_free(MSM_V_HSMIC_2V85_EN);
 
 	ret = gpio_request(MSM_AUD_LS_EN, "1wire_level_en");
 	if (ret) {
-		pr_err("[HS_BOARD]gpio_request for %d gpio failed rc(%d)\n", MSM_AUD_LS_EN, ret);
+		//pr_err("[HS_BOARD]gpio_request for %d gpio failed rc(%d)\n", MSM_AUD_LS_EN, ret);
 		return;
 	}
 
 	ret = gpio_direction_output(MSM_AUD_LS_EN, 1);
 	if (ret) {
-		pr_err("[HS_BOARD]gpio_direction_output failed for %d gpio rc(%d)\n", MSM_AUD_LS_EN, ret);
+		//pr_err("[HS_BOARD]gpio_direction_output failed for %d gpio rc(%d)\n", MSM_AUD_LS_EN, ret);
 		return;
 	}
 	gpio_free(MSM_AUD_LS_EN);
@@ -2601,29 +2524,29 @@ static void headset_power(int enable)
 		gpio_tlmm_config(headset_cpu_gpio[i], GPIO_CFG_ENABLE);
 	}
 
-	pr_info("[HS_BOARD]%s mic bias\n", enable ? "Enable" : "Disable");
+	//pr_info("[HS_BOARD]%s mic bias\n", enable ? "Enable" : "Disable");
 	ret = gpio_request(MSM_V_HSMIC_2V85_EN, "headset_mic_bias");
 	if (ret) {
-		pr_err("[HS_BOARD]gpio_request for %d gpio failed rc(%d)\n", MSM_V_HSMIC_2V85_EN, ret);
+		//pr_err("[HS_BOARD]gpio_request for %d gpio failed rc(%d)\n", MSM_V_HSMIC_2V85_EN, ret);
 		return;
 	}
 
 	ret = gpio_direction_output(MSM_V_HSMIC_2V85_EN, enable);
 	if (ret) {
-		pr_err("[HS_BOARD]gpio_direction_output failed for %d gpio rc(%d)\n",MSM_V_HSMIC_2V85_EN, ret);
+		//pr_err("[HS_BOARD]gpio_direction_output failed for %d gpio rc(%d)\n",MSM_V_HSMIC_2V85_EN, ret);
 		return;
 	}
 	gpio_free(MSM_V_HSMIC_2V85_EN);
 
 	ret = gpio_request(MSM_AUD_LS_EN, "1wire_level_en");
 	if (ret) {
-		pr_err("[HS_BOARD]gpio_request for %d gpio failed rc(%d)\n", MSM_AUD_LS_EN, ret);
+		//pr_err("[HS_BOARD]gpio_request for %d gpio failed rc(%d)\n", MSM_AUD_LS_EN, ret);
 		return;
 	}
 
 	ret = gpio_direction_output(MSM_AUD_LS_EN, 1);
 	if (ret) {
-		pr_err("[HS_BOARD]gpio_direction_output failed for %d gpio rc(%d)\n", MSM_AUD_LS_EN, ret);
+		//pr_err("[HS_BOARD]gpio_direction_output failed for %d gpio rc(%d)\n", MSM_AUD_LS_EN, ret);
 		return;
 	}
 	gpio_free(MSM_AUD_LS_EN);
@@ -2653,13 +2576,13 @@ static struct platform_device htc_headset_mgr = {
 
 static void headset_device_register(void)
 {
-	pr_info("[HS_BOARD] (%s) Headset device register\n", __func__);
+	//pr_info("[HS_BOARD] (%s) Headset device register\n", __func__);
 	platform_device_register(&htc_headset_mgr);
 }
 
 static void gsbi_qup_i2c_gpio_config(int adap_id, int config_type)
 {
-	printk(KERN_INFO "%s(): adap_id = %d, config_type = %d \n", __func__, adap_id, config_type);
+	//printk(KERN_INFO "%s(): adap_id = %d, config_type = %d \n", __func__, adap_id, config_type);
 
 	if ((adap_id == MSM_8930_GSBI3_QUP_I2C_BUS_ID) && (config_type == 1)) {
 		gpio_tlmm_config(gsbi3_gpio_table[0], GPIO_CFG_ENABLE);
@@ -2762,9 +2685,19 @@ static struct platform_device msm_tsens_device = {
 static struct msm_thermal_data msm_thermal_pdata = {
 	.sensor_id = 9,
 	.poll_ms = 250,
-	.limit_temp_degC = 60,
-	.temp_hysteresis_degC = 10,
-	.freq_step = 2,
+#ifdef CONFIG_CPU_MAX_OVERCLOCK
+        .limit_temp_degC = 70,
+#else
+        .limit_temp_degC = 60,
+#endif
+#ifdef CONFIG_INTELLI_THERMAL
+        .freq_control_mask = 0xf,
+        .core_limit_temp_degC = 80,
+        .core_temp_hysteresis_degC = 10,
+        .core_control_mask = 0xe,
+#endif
+        .temp_hysteresis_degC = 10,
+        .freq_step = 2,
 };
 
 #ifdef CONFIG_MSM_FAKE_BATTERY
@@ -2792,7 +2725,6 @@ static struct platform_device msm8930_device_ext_l2_vreg __devinitdata = {
 };
 
 #else
-
 
 static struct platform_device msm8930_device_ext_otg_sw_vreg __devinitdata = {
 	.name	= GPIO_REGULATOR_DEV_NAME,
@@ -3167,13 +3099,13 @@ static int k2_ul_g_sensor_power_LPM(int on)
 
 	mutex_lock(&sensor_lock);
 
-	printk(KERN_DEBUG "[GSNR][BMA250] %s, on = %d\n", __func__, on);
+	//printk(KERN_DEBUG "[GSNR][BMA250] %s, on = %d\n", __func__, on);
 
 	if (g_sensor_reg_l9 == NULL) {
 		g_sensor_reg_l9 = regulator_get(NULL, "8038_l9_g_sensor");
 		if (IS_ERR(g_sensor_reg_l9)) {
-			pr_err("[GSNR][BMA250] %s: Unable to get"
-				" '8038_l9_g_sensor' \n", __func__);
+			/*pr_err("[GSNR][BMA250] %s: Unable to get"
+				" '8038_l9_g_sensor' \n", __func__);*/
 			mutex_unlock(&sensor_lock);
 			return -ENODEV;
 		}
@@ -3182,23 +3114,23 @@ static int k2_ul_g_sensor_power_LPM(int on)
 	if (on) {
 		rc = regulator_set_optimum_mode(g_sensor_reg_l9, 100);
 		if (rc < 0) {
-			pr_err("[GSNR][BMA250] set_optimum_mode L9 to LPM"
-				" failed, rc = %d\n", rc);
+			/*pr_err("[GSNR][BMA250] set_optimum_mode L9 to LPM"
+				" failed, rc = %d\n", rc);*/
 			mutex_unlock(&sensor_lock);
 			return -EINVAL;
 		}
-		printk(KERN_DEBUG "[GSNR][BMA250] %s, Set to Low Power"
-			" Mode\n", __func__);
+		/*printk(KERN_DEBUG "[GSNR][BMA250] %s, Set to Low Power"
+			" Mode\n", __func__);*/
 	} else {
 		rc = regulator_set_optimum_mode(g_sensor_reg_l9, 100000);
 		if (rc < 0) {
-			pr_err("[GSNR][BMA250] set_optimum_mode L9 to"
-				" Normal mode failed, rc = %d\n", rc);
+			/*pr_err("[GSNR][BMA250] set_optimum_mode L9 to"
+				" Normal mode failed, rc = %d\n", rc);*/
 			mutex_unlock(&sensor_lock);
 			return -EINVAL;
 		}
-		printk(KERN_DEBUG "[GSNR][BMA250] %s, Set to Normal Mode\n",
-			__func__);
+		/*printk(KERN_DEBUG "[GSNR][BMA250] %s, Set to Normal Mode\n",
+			__func__);*/
 
 	}
 	mutex_unlock(&sensor_lock);
@@ -3217,13 +3149,13 @@ static int k2_ul_compass_power_LPM(int on)
 
 	mutex_lock(&sensor_lock);
 
-	printk(KERN_DEBUG "[COMP][AKM8975] %s, on = %d\n", __func__, on);
+	//printk(KERN_DEBUG "[COMP][AKM8975] %s, on = %d\n", __func__, on);
 
 	if (compass_reg_l9 == NULL) {
 		compass_reg_l9 = regulator_get(NULL, "8038_l9_compass");
 		if (IS_ERR(compass_reg_l9)) {
-			pr_err("[GSNR][BMA250] %s: Unable to get"
-				" '8038_l9_compass' \n", __func__);
+			/*pr_err("[GSNR][BMA250] %s: Unable to get"
+				" '8038_l9_compass' \n", __func__);*/
 			mutex_unlock(&sensor_lock);
 			return -ENODEV;
 		}
@@ -3232,23 +3164,23 @@ static int k2_ul_compass_power_LPM(int on)
 	if (on) {
 		rc = regulator_set_optimum_mode(compass_reg_l9, 100);
 		if (rc < 0) {
-			pr_err("[COMP][AKM8975] set_optimum_mode L9 to LPM"
-				" failed, rc = %d\n", rc);
+			/*pr_err("[COMP][AKM8975] set_optimum_mode L9 to LPM"
+				" failed, rc = %d\n", rc);*/
 			mutex_unlock(&sensor_lock);
 			return -EINVAL;
 		}
-		printk(KERN_DEBUG "[COMP][AKM8975] %s, Set to Low Power"
-			" Mode\n", __func__);
+		/*printk(KERN_DEBUG "[COMP][AKM8975] %s, Set to Low Power"
+			" Mode\n", __func__);*/
 	} else {
 		rc = regulator_set_optimum_mode(compass_reg_l9, 100000);
 		if (rc < 0) {
-			pr_err("[COMP][AKM8975] set_optimum_mode L9 to "
-				"Normal mode failed, rc = %d\n", rc);
+			/*pr_err("[COMP][AKM8975] set_optimum_mode L9 to "
+				"Normal mode failed, rc = %d\n", rc);*/
 			mutex_unlock(&sensor_lock);
 			return -EINVAL;
 		}
-		printk(KERN_DEBUG "[COMP][AKM8975] %s, Set to Normal Mode\n",
-			__func__);
+		/*printk(KERN_DEBUG "[COMP][AKM8975] %s, Set to Normal Mode\n",
+			__func__);*/
 
 	}
 	mutex_unlock(&sensor_lock);
@@ -3317,29 +3249,6 @@ static struct i2c_registry msm8960_i2c_devices[] __initdata = {
 };
 #endif 
 
-
-
-static int __init check_dq_setup(char *str)
-{
-	int i = 0;
-	int size = 0;
-
-	size = sizeof(chg_batt_params)/sizeof(chg_batt_params[0]);
-
-	if (!strcmp(str, "PASS")) {
-		
-	} else {
-		for(i=0; i < size; i++)
-		{
-			chg_batt_params[i].max_voltage = 4200;
-			chg_batt_params[i].cool_bat_voltage = 4200;
-		}
-	}
-	return 1;
-}
-__setup("androidboot.dq=", check_dq_setup);
-
-
 static void __init register_i2c_devices(void)
 {
 #ifdef CONFIG_I2C
@@ -3362,7 +3271,7 @@ static void __init register_i2c_devices(void)
 	else if (machine_is_msm8930_mtp() || machine_is_msm8627_mtp())
 		mach_mask = I2C_FFA;
 	else
-		pr_err("unmatched machine ID in register_i2c_devices\n");
+		/*pr_err("unmatched machine ID in register_i2c_devices\n")*/;
 
 	
 	for (i = 0; i < ARRAY_SIZE(msm8960_i2c_devices); ++i) {
@@ -3380,11 +3289,31 @@ static void __init register_i2c_devices(void)
 #endif
 }
 
+static int __init check_dq_setup(char *str)
+{
+	int i = 0;
+	int size = 0;
+
+	size = sizeof(chg_batt_params)/sizeof(chg_batt_params[0]);
+
+	if (!strcmp(str, "PASS")) {
+		
+	} else {
+		for(i=0; i < size; i++)
+		{
+			chg_batt_params[i].max_voltage = 4200;
+			chg_batt_params[i].cool_bat_voltage = 4200;
+		}
+	}
+	return 1;
+}
+__setup("androidboot.dq=", check_dq_setup);
+
 
 static void __init k2_ul_init(void)
 {
 	if (meminfo_init(SYS_MEMORY, SZ_256M) < 0)
-		pr_err("meminfo_init() failed!\n");
+		/*pr_err("meminfo_init() failed!\n")*/;
 
 	msm_tsens_early_init(&msm_tsens_pdata);
 	msm_thermal_init(&msm_thermal_pdata);
@@ -3394,7 +3323,7 @@ static void __init k2_ul_init(void)
 
 	regulator_suppress_info_printing();
 	if (msm_xo_init())
-		pr_err("Failed to initialize XO votes\n");
+		/*pr_err("Failed to initialize XO votes\n")*/;
 
 	platform_device_register(&msm8930_device_rpm_regulator);
 
@@ -3422,13 +3351,6 @@ static void __init k2_ul_init(void)
 	msm8930_init_pmic();
 
 	msm8930_i2c_init();
-
-	if ((engineerid & 0x02) == 2) {
-		if (!strcmp(msm_i2c_syn_gsbi3_info[0].type, SYNAPTICS_3200_NAME)) {
-			pr_info("[TP] alps sensor");
-			msm_i2c_syn_gsbi3_info[0].platform_data = &syn_ts_3k_data_apl;
-		}
-	}
 	k2_init_fb();
 	k2_init_gpu();
 	msm_spm_init(msm_spm_data, ARRAY_SIZE(msm_spm_data));
@@ -3467,7 +3389,7 @@ static void __init k2_ul_init(void)
 	
 	
 	if (k2_ul_init_mmc() != 0)
-		printk(KERN_ERR "%s: Unable to initialize MMC (SDCC4)\n", __func__);
+		/*printk(KERN_ERR "%s: Unable to initialize MMC (SDCC4)\n", __func__)*/;
 	
 	syn_init_vkeys_k2();
 
@@ -3482,9 +3404,8 @@ static void __init k2_ul_init(void)
 	BUG_ON(msm_pm_boot_init(&msm_pm_boot_pdata));
 	msm_pm_init_sleep_status_data(&msm_pm_slp_sts_data);
 
-
 #ifdef CONFIG_CPU_FREQ_GOV_ONDEMAND_2_PHASE
-	set_two_phase_freq(1026000);
+	set_two_phase_freq(918000);
 #endif
 
 	k2_ul_init_keypad();
@@ -3520,7 +3441,6 @@ static void __init k2_ul_fixup(struct tag *tags,
 		mi->bank[0].size = SIZE_ADDR1;
 	mi->bank[1].start = PHY_BASE_ADDR2;
 	mi->bank[1].size = SIZE_ADDR2;
-	engineerid = parse_tag_engineerid(tags);
 }
 
 MACHINE_START(K2_UL, "k2_ul")
