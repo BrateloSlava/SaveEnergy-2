@@ -71,7 +71,7 @@
 #define DBS_UI_SAMPLING_TIMEOUT			(80)
 
 #define DEF_FREQ_STEP				(25)
-#define DEF_STEP_UP_EARLY_HISPEED		(1134000)
+#define DEF_STEP_UP_EARLY_HISPEED		(918000)
 #define DEF_STEP_UP_INTERIM_HISPEED		(1188000)
 #define DEF_SAMPLING_EARLY_HISPEED_FACTOR	(2)
 #define DEF_SAMPLING_INTERIM_HISPEED_FACTOR	(3)
@@ -108,7 +108,7 @@ static freq_table_idx pre_freq_idx[SUP_CORE_NUM] = {};
 
 #if defined(SMART_UP_SLOW_UP_AT_HIGH_FREQ)
 
-#define SUP_SLOW_UP_FREQUENCY 		(1134000)
+#define SUP_SLOW_UP_FREQUENCY 		(810000)
 #define SUP_HIGH_SLOW_UP_FREQUENCY 	(1188000)
 #define SUP_SLOW_UP_LOAD 		(90)
 
@@ -1305,18 +1305,6 @@ static void dbs_freq_increase(struct cpufreq_policy *p, unsigned int freq)
 
 	__cpufreq_driver_target(p, freq, dbs_tuners_ins.powersave_bias ?
 			CPUFREQ_RELATION_L : CPUFREQ_RELATION_H);
-}
-
-int set_two_phase_freq(int cpufreq)
-{
-	int i  = 0;
-	for ( i = 0 ; i < NR_CPUS; i++)
-		two_phase_freq_array[i] = cpufreq;
-	return 0;
-}
-
-void set_two_phase_freq_by_cpu ( int cpu_nr, int cpufreq){
-	two_phase_freq_array[cpu_nr-1] = cpufreq;
 }
 
 static int input_event_boosted(void)

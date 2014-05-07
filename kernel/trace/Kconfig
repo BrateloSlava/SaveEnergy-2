@@ -160,7 +160,7 @@ config FUNCTION_GRAPH_TRACER
 	depends on HAVE_FUNCTION_GRAPH_TRACER
 	depends on FUNCTION_TRACER
 	depends on !X86_32 || !CC_OPTIMIZE_FOR_SIZE
-	default y
+	default n
 	help
 	  Enable the kernel to trace a function at both its return
 	  and its entry.
@@ -326,6 +326,7 @@ config STACK_TRACER
 	select FUNCTION_TRACER
 	select STACKTRACE
 	select KALLSYMS
+	default n
 	help
 	  This special tracer records the maximum stack footprint of the
 	  kernel and displays it in /sys/kernel/debug/tracing/stack_trace.

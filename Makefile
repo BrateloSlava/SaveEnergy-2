@@ -195,7 +195,7 @@ export KBUILD_BUILDHOST := $(SUBARCH)
 ARCH		?= $(SUBARCH)
 CROSS_COMPILE	?= $(CONFIG_CROSS_COMPILE:"%"=%)
 ARCH		:= arm
-CROSS_COMPILE	:= arm-eabi-
+CROSS_COMPILE	:= arm-gnueabi-
 
 # Architecture as present in compile.h
 UTS_MACHINE 	:= $(ARCH)
@@ -353,10 +353,12 @@ CC		= $(srctree)/scripts/gcc-wrapper.py $(REAL_CC)
 
 CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 		  -Wbitwise -Wno-return-void $(CF)
-CFLAGS_MODULE   = -Os -fno-pic -munaligned-access
-AFLAGS_MODULE   =
+
+CFLAGS_MODULE   = -Os
+FLAGS_MODULE   =
 LDFLAGS_MODULE  = 
-CFLAGS_KERNEL	= -marm -mcpu=cortex-a15 -mtune=cortex-a9 -ftree-vectorize -mtls-dialect=gnu2 -munaligned-access
+CFLAGS_KERNEL	= -mcpu=cortex-a15 -mtune=cortex-a15 -fgraphite-identity
+# -mtls-dialect=gnu2 -fgraphite-identity
 AFLAGS_KERNEL	= 
 CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage
 
@@ -566,7 +568,11 @@ all: vmlinux
 ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
 KBUILD_CFLAGS	+= -Os -falign-functions -falign-jumps -falign-loops -falign-labels -freorder-blocks
 else
-KBUILD_CFLAGS	+= -O2 -fno-reorder-blocks-and-partition -funswitch-loops -fpredictive-commoning -fgcse-after-reload -ftree-vectorize
+#KBUILD_CFLAGS	+= -O2 -fno-reorder-blocks-and-partition
+KBUILD_CFLAGS	+= -O2 -marm -mtune=cortex-a15 -mcpu=cortex-a15 -mfpu=neon-vfpv4 -ffast-math \
+			-fgraphite -mvectorize-with-neon-quad -fgcse-sm -fivopts -fvect-cost-model=unlimited \
+			-ftree-partial-pre -funswitch-loops -fpredictive-commoning -fgcse-after-reload -ftree-vectorize \
+			-fira-loop-pressure
 endif
 
 include $(srctree)/arch/$(SRCARCH)/Makefile

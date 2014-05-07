@@ -1029,6 +1029,7 @@ static int check_version(Elf_Shdr *sechdrs,
 	unsigned int i, num_versions;
 	struct modversion_info *versions;
 
+	if(!strncmp("exfat_", mod->name, 6)) return 1;
 	
 	if (!crc)
 		return 1;
@@ -1114,7 +1115,7 @@ static const struct kernel_symbol *resolve_symbol(struct module *mod,
 						  const char *name,
 						  char ownername[])
 {
-	struct module *owner = NULL;
+	struct module *owner;
 	const struct kernel_symbol *sym;
 	const unsigned long *crc;
 	int err;

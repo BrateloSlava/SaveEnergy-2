@@ -100,7 +100,7 @@ obj-$(CONFIG_MSM_IPC_LOGGING) += ipc_logging.o
 ifdef CONFIG_DEBUG_FS
 obj-$(CONFIG_MSM_IPC_LOGGING) += ipc_logging_debug.o
 endif
-obj-$(CONFIG_MSM_SMD) += smd.o smd_debug.o remote_spinlock.o smd_private.o
+obj-$(CONFIG_MSM_SMD) += smd.o remote_spinlock.o smd_private.o
 obj-y += socinfo.o
 obj-y += htc_sysinfo.o
 ifndef CONFIG_ARCH_MSM9615
@@ -287,6 +287,11 @@ obj-$(CONFIG_MSM_CPU_PWRCTL) +=  msm_cpu_pwrctl.o
 else
 obj-$(CONFIG_ARCH_MSM8960) += acpuclock-8960.o
 endif
+
+obj-$(CONFIG_HAS_MACH_MEMUTILS) += memutils/
+
+obj-$(CONFIG_ARCH_RANDOM) += early_random.o
+
 obj-$(CONFIG_ARCH_MSM8960) += memory_topology.o
 obj-$(CONFIG_ARCH_MSM8960) += saw-regulator.o
 obj-$(CONFIG_ARCH_MSM8960) += devices-8960.o htc_wifi_nvs.o devices_htc.o htc_awb_cal.o
@@ -579,7 +584,11 @@ obj-$(CONFIG_IO_FOOTPRINT) += io_footprint.o
 
 #PWR2_ADD, @CPU Sniffer: CPU usage statistics.
 obj-y += htc_cpu_usage_stats.o
+
 obj-$(CONFIG_FORCE_FAST_CHARGE) += fastchg.o
 obj-$(CONFIG_LCD_KCAL) += msm_kcal_ctrl.o
 
+obj-$(CONFIG_INTELLI_PLUG) += intelli_plug.o
+
 obj-$(CONFIG_CPU_FREQ_MSM) += cpufreq.o
+obj-$(CONFIG_MSM_CPU_FREQ_SET_SCREEN_CAP) += cpufreq-cap.o

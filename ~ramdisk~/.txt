@@ -1,4 +1,5 @@
 freq 162000
 sched_mc_power_savings 2
+mpdecision off
 
 # Turn off debugging for certain modules

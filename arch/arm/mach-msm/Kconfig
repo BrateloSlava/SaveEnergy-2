@@ -145,6 +145,7 @@ config ARCH_MSM8960
 	select ARM_HAS_SG_CHAIN
 	select MSM_KRAIT_WFE_FIXUP
 	select MSM_IOMMU_GPU_SYNC
+	select HAS_MACH_MEMUTILS
 
 config ARCH_MSM8930
 	bool "MSM8930"
@@ -178,6 +179,7 @@ config ARCH_MSM8930
 	select ARM_HAS_SG_CHAIN
 	select MSM_KRAIT_WFE_FIXUP
 	select MSM_IOMMU_GPU_SYNC
+	select HAS_MACH_MEMUTILS
 
 config ARCH_APQ8064
 	bool "APQ8064"
@@ -1746,7 +1748,35 @@ config MSM_CPU_FREQ_MIN
 	depends on MSM_CPU_FREQ_SET_MIN_MAX
 	default 162000
 
+config MSM_CPU_FREQ_SET_SCREEN_CAP
+	bool "Screen off freq cap drivers"
+	default n
+
+config MSM_CPU_FREQ_SCREEN_CAP
+	int "Min CPU Freq when turn off display"
+	depends on MSM_CPU_FREQ_SET_SCREEN_CAP
+	default 702000
+
 endif # CPU_FREQ_MSM
+
+config INTELLI_PLUG
+	bool "Enable intelli-plug cpu hotplug driver"
+	default n
+	help
+	  Generic Intelli-plug cpu hotplug driver for ARM SOCs
+
+config INTELLI_PLUG_DUAL
+	bool "Enable dual-core mode for intelliplug"
+	depends on INTELLI_PLUG
+	default n
+	help
+	  Special dual-core mode for intelli-plug
+
+config SLEEPY_PLUG
+	bool "Enable sleepy_plug by rmbq"
+	default n
+	help
+	  Not compatible with INTELLI_PLUG
 
 config USERSPACE_VOLTAGE_CONTROL
 	bool "Enable Userspace CPU Voltage Control"
@@ -1774,12 +1804,14 @@ config GPU_OVERCLOCK
 
 config CPU_MAX_OVERCLOCK
         bool "Enable CPU Overclocking option 1.674 GHz"
+	depends on CPU_OVERCLOCK
         default n
         help
           Qualcomm overclocking up to 1.674 GHz
 
 config GPU_MAX_OVERCLOCK
         bool "Enable GPU Overclocking option 487.5 MHz"
+	depends on GPU_OVERCLOCK
         default n
         help
           Qualcomm GPU overclocking to 487.5 MHz
@@ -2407,9 +2439,6 @@ config MSM_STANDALONE_POWER_COLLAPSE
        bool "Enable standalone power collapse"
        default n
 
-config SLEEPY_PLUG
-	bool "sleepy_plug by rmbq"
-	default n
 config MSM_GSBI9_UART
 	bool "Enable GSBI9 UART device"
 	default n
@@ -2892,12 +2921,6 @@ config QUALCOMM_WLAN_PXO
 	help
 	  Use PXO for clock source of WLAN chip
 
-config UPDATE_LCDC_LUT
-	default y
-	bool "enable LCDC LUT"
-	help
-	  enable LCDC LUT
-
 config FORCE_FAST_CHARGE
 	bool "Force AC charge mode at will"
 	default y
@@ -2907,15 +2930,20 @@ config FORCE_FAST_CHARGE
 
 config UPDATE_LCDC_LUT
         bool "Set initial Qualcomm LCDC lut"
-        default n
+        default y
         help
           Set initial Qualcomm LCDC Look Up Table.
 
 config LCD_KCAL
         tristate "MSM generic LCDC Calibration"
-        default n
+        default y
         help
           Enable MSM generic LCDC temperature Calibration.
 
+config HAS_MACH_MEMUTILS
+	default y
+	bool "Motorola MSM memcpy enhancements"
+	help
+	Faster memcpy performance for Krait
 endif
 

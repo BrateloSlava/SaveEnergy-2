@@ -32,6 +32,7 @@
 #include <asm/cputype.h>
 #include <asm/exception.h>
 #include <asm/idmap.h>
+
 #include <asm/topology.h>
 #include <asm/mmu_context.h>
 #include <asm/pgtable.h>
@@ -169,7 +170,7 @@ void __cpu_die(unsigned int cpu)
 	pr_debug("CPU%u: shutdown\n", cpu);
 
 	if (!platform_cpu_kill(cpu))
-		printk("CPU%u: unable to kill\n", cpu);
+		pr_debug("CPU%u: unable to kill\n", cpu);
 }
 
 /*
@@ -291,7 +292,7 @@ void __init smp_cpus_done(unsigned int max_cpus)
 	for_each_online_cpu(cpu)
 		bogosum += per_cpu(cpu_data, cpu).loops_per_jiffy;
 
-	printk(KERN_INFO "SMP: Total of %d processors activated "
+	pr_debug(KERN_INFO "SMP: Total of %d processors activated "
 	       "(%lu.%02lu BogoMIPS).\n",
 	       num_online_cpus(),
 	       bogosum / (500000/HZ),
@@ -481,7 +482,7 @@ static void ipi_cpu_stop(unsigned int cpu)
 	if (system_state == SYSTEM_BOOTING ||
 	    system_state == SYSTEM_RUNNING) {
 		raw_spin_lock(&stop_lock);
-		printk(KERN_CRIT "CPU%u: stopping\n", cpu);
+		pr_debug(KERN_CRIT "CPU%u: stopping\n", cpu);
 		dump_stack();
 		raw_spin_unlock(&stop_lock);
 	}
@@ -601,7 +602,7 @@ void handle_IPI(int ipinr, struct pt_regs *regs)
 		break;
 
 	default:
-		printk(KERN_CRIT "CPU%u: Unknown IPI message 0x%x\n",
+		pr_debug(KERN_CRIT "CPU%u: Unknown IPI message 0x%x\n",
 		       cpu, ipinr);
 		break;
 	}
@@ -610,6 +611,7 @@ void handle_IPI(int ipinr, struct pt_regs *regs)
 
 void smp_send_reschedule(int cpu)
 {
+	BUG_ON(cpu_is_offline(cpu));
 	smp_cross_call(cpumask_of(cpu), IPI_RESCHEDULE);
 }
 
@@ -635,9 +637,9 @@ void smp_send_stop(void)
 		smp_cross_call(&mask, IPI_CPU_STOP);
 
 	/* Wait up to one second for other CPUs to stop */
-	timeout = USEC_PER_SEC;
+	timeout = MSEC_PER_SEC;
 	while (num_active_cpus() > 1 && timeout--)
-		udelay(1);
+		mdelay(1);
 
 	if (num_active_cpus() > 1)
 		pr_warning("SMP: failed to stop secondary CPUs\n");

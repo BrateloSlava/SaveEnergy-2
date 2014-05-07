@@ -230,7 +230,8 @@ static struct delayed_work queue_rx_work;
 static struct workqueue_struct *bam_mux_rx_workqueue;
 static struct workqueue_struct *bam_mux_tx_workqueue;
 
-#define UL_TIMEOUT_DELAY 1000	
+/* A2 power collaspe */
+#define UL_TIMEOUT_DELAY 300	/* in ms */
 #define ENABLE_DISCONNECT_ACK	0x1
 static void toggle_apps_ack(void);
 static void reconnect_to_bam(void);
@@ -1677,7 +1678,10 @@ static void ul_timeout(struct work_struct *work)
 			ul_packet_written = 0;
 			schedule_delayed_work(&ul_timeout_work,
 					msecs_to_jiffies(UL_TIMEOUT_DELAY));
-		} else {
+                } else if(polling_mode) {
+                        schedule_delayed_work(&ul_timeout_work,
+                                       msecs_to_jiffies(UL_TIMEOUT_DELAY));
+                } else {
 			ul_powerdown();
 		}
 	} else {

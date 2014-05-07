@@ -118,6 +118,8 @@ extern unsigned long nr_iowait(void);
 extern unsigned long nr_iowait_cpu(int cpu);
 extern unsigned long this_cpu_load(void);
 
+extern unsigned long get_avg_nr_running(unsigned int cpu);
+extern unsigned long avg_nr_running(void);
 
 extern void calc_global_load(unsigned long ticks);
 
@@ -306,7 +308,10 @@ extern signed long schedule_timeout_killable(signed long timeout);
 extern signed long schedule_timeout_uninterruptible(signed long timeout);
 asmlinkage void schedule(void);
 extern void schedule_preempt_disabled(void);
+#ifdef CONFIG_MUTEX_SPIN_ON_OWNER
 extern int mutex_spin_on_owner(struct mutex *lock, struct task_struct *owner);
+extern int mutex_can_spin_on_owner(struct mutex *lock);
+#endif
 
 struct nsproxy;
 struct user_namespace;
@@ -423,6 +428,7 @@ struct signal_struct {
 	atomic_t		sigcnt;
 	atomic_t		live;
 	int			nr_threads;
+	struct list_head	thread_head;
 
 	wait_queue_head_t	wait_chldexit;	
 
@@ -758,6 +764,7 @@ struct sched_domain {
 	unsigned int nr_balance_failed; 
 
 	u64 last_update;
+	u64 max_newidle_lb_cost;
 
 #ifdef CONFIG_SCHEDSTATS
 	
@@ -1023,6 +1030,9 @@ struct task_struct {
 #ifdef CONFIG_SMP
 	struct llist_node wake_entry;
 	int on_cpu;
+	struct task_struct *last_wakee;
+	unsigned long wakee_flips;
+	unsigned long wakee_flip_decay_ts;
 #endif
 	int on_rq;
 
@@ -1113,6 +1123,7 @@ struct task_struct {
 	
 	struct pid_link pids[PIDTYPE_MAX];
 	struct list_head thread_group;
+	struct list_head thread_node;
 
 	struct completion *vfork_done;		
 	int __user *set_child_tid;		
@@ -1943,6 +1954,16 @@ extern bool current_is_single_threaded(void);
 
 #define while_each_thread(g, t) \
 	while ((t = next_thread(t)) != g)
+
+#define __for_each_thread(signal, t)	\
+	list_for_each_entry_rcu(t, &(signal)->thread_head, thread_node)
+
+#define for_each_thread(p, t)		\
+	__for_each_thread((p)->signal, t)
+
+/* Careful: this is a double loop, 'break' won't work as expected. */
+#define for_each_process_thread(p, t)	\
+	for_each_process(p) for_each_thread(p, t)
 
 static inline int get_nr_threads(struct task_struct *tsk)
 {

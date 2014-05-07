@@ -45,6 +45,8 @@
 #include <mach/perflock.h>
 #endif
 
+#define MAX_FREQ_STEPS	30 // default value from stock source
+
 #ifdef pr_err
 #undef pr_err
 #endif
@@ -371,7 +373,7 @@ static struct scalable scalable_8930[] = {
 			.hfpll_base      = MSM_HFPLL_BASE + 0x200,
 			.aux_clk_sel     = MSM_ACC0_BASE  + 0x014,
 			.l2cpmr_iaddr    = L2CPUCPMR_IADDR,
-#if defined(CONFIG_CPU_OVERCLOCK) || defined(CONFIG_CPU_MAX_OVERCLOCK)
+#ifdef CONFIG_CPU_OVERCLOCK
 			.vreg[VREG_CORE] = { "krait0",     1300000 },
 #else
 			.vreg[VREG_CORE] = { "krait0",     1250000 },
@@ -391,7 +393,7 @@ static struct scalable scalable_8930[] = {
 			.hfpll_base      = MSM_HFPLL_BASE + 0x300,
 			.aux_clk_sel     = MSM_ACC1_BASE  + 0x014,
 			.l2cpmr_iaddr    = L2CPUCPMR_IADDR,
-#if defined(CONFIG_CPU_OVERCLOCK) || defined(CONFIG_CPU_MAX_OVERCLOCK)
+#ifdef CONFIG_CPU_OVERCLOCK
 			.vreg[VREG_CORE] = { "krait1",     1300000 },
 #else
 			.vreg[VREG_CORE] = { "krait1",     1250000 },
@@ -494,7 +496,11 @@ static struct msm_bus_paths bw_level_tbl[] = {
 	[4] = BW_MBPS(3200), 
 	[5] = BW_MBPS(3600), 
 	[6] = BW_MBPS(3936), 
+#ifdef CONFIG_CPU_MAX_OVERCLOCK
+	[7] = BW_MBPS(4280), 
+#else
 	[7] = BW_MBPS(4264), 
+#endif
 };
 
 static struct msm_bus_scale_pdata bus_client_pdata = {
@@ -991,44 +997,52 @@ static struct acpu_level acpu_freq_tbl_8930_slow[] = {
 	{ 0, { STBY_KHZ, QSB,   0, 0, 0x00 }, L2(0),   900000 },
 #ifdef CONFIG_LOW_CPUCLOCKS
 	{ 1, {   162000, HFPLL, 2, 0, 0x0C }, L2(1),   900000 },
-	{ 1, {   216000, HFPLL, 2, 0, 0x10 }, L2(1),   900000 },
+	{ 0, {   216000, HFPLL, 2, 0, 0x10 }, L2(1),   900000 },
 	{ 1, {   270000, HFPLL, 2, 0, 0x14 }, L2(1),   900000 },
 	{ 1, {   324000, HFPLL, 2, 0, 0x18 }, L2(1),   925000 },
-	{ 1, {   378000, HFPLL, 2, 0, 0x1C }, L2(1),   925000 },
+	{ 0, {   378000, HFPLL, 2, 0, 0x1C }, L2(1),   925000 },
 #else
 	{ 1, {   162000, HFPLL, 2, 0, 0x0C }, L2(1),   900000 },
 #endif
 	{ 1, {   384000, PLL_8, 0, 2, 0x00 }, L2(1),   925000 },
+	{ 0, {   432000, HFPLL, 2, 0, 0x20 }, L2(6),   925000 },
 	{ 1, {   486000, HFPLL, 2, 0, 0x24 }, L2(6),   925000 },
+	{ 0, {   540000, HFPLL, 2, 0, 0x28 }, L2(6),   975000 },
 	{ 1, {   594000, HFPLL, 1, 0, 0x16 }, L2(6),   975000 },
+	{ 0, {   648000, HFPLL, 1, 0, 0x18 }, L2(6),  1000000 },
 	{ 1, {   702000, HFPLL, 1, 0, 0x1A }, L2(6),  1000000 },
+	{ 0, {   756000, HFPLL, 1, 0, 0x1C }, L2(11), 1050000 },
 	{ 1, {   810000, HFPLL, 1, 0, 0x1E }, L2(11), 1050000 },
+	{ 0, {   864000, HFPLL, 1, 0, 0x20 }, L2(11), 1075000 },
 	{ 1, {   918000, HFPLL, 1, 0, 0x22 }, L2(11), 1075000 },
+	{ 0, {   972000, HFPLL, 1, 0, 0x24 }, L2(11), 1100000 },
 	{ 1, {  1026000, HFPLL, 1, 0, 0x26 }, L2(11), 1100000 },
 #ifdef CONFIG_LOW_CPUCLOCKS
-	{ 1, {  1134000, HFPLL, 1, 0, 0x2A }, L2(17), 1150000 },
+	{ 1, {  1080000, HFPLL, 1, 0, 0x28 }, L2(15), 1150000 },
+	{ 0, {  1134000, HFPLL, 1, 0, 0x2A }, L2(15), 1150000 },
 	{ 1, {  1188000, HFPLL, 1, 0, 0x2C }, L2(17), 1175000 },
 #ifdef CONFIG_CPU_OVERCLOCK
-	{ 1, {  1242000, HFPLL, 1, 0, 0x2E }, L2(17), 1200000 },
+	{ 0, {  1242000, HFPLL, 1, 0, 0x2E }, L2(17), 1200000 },
 	{ 1, {  1350000, HFPLL, 1, 0, 0x32 }, L2(17), 1250000 },
 	{ 1, {  1458000, HFPLL, 1, 0, 0x36 }, L2(17), 1275000 },
+#endif // CONFIG_CPU_OVERCLOCK
 #ifdef CONFIG_CPU_MAX_OVERCLOCK
 	{ 1, {  1566000, HFPLL, 1, 0, 0x3A }, L2(17), 1300000 },
 	{ 1, {  1674000, HFPLL, 1, 0, 0x3E }, L2(17), 1300000 },
 #endif // CONFIG_CPU_MAX_OVERCLOCK
-#endif // CONFIG_CPU_OVERCLOCK
 #else
-	{ 1, {  1134000, HFPLL, 1, 0, 0x2A }, L2(16), 1150000 },
+	{ 1, {  1080000, HFPLL, 1, 0, 0x28 }, L2(14), 1150000 },
+	{ 0, {  1134000, HFPLL, 1, 0, 0x2A }, L2(14), 1150000 },
 	{ 1, {  1188000, HFPLL, 1, 0, 0x2C }, L2(16), 1175000 },
 #ifdef CONFIG_CPU_OVERCLOCK
-	{ 1, {  1242000, HFPLL, 1, 0, 0x2E }, L2(16), 1200000 },
+	{ 0, {  1242000, HFPLL, 1, 0, 0x2E }, L2(16), 1200000 },
 	{ 1, {  1350000, HFPLL, 1, 0, 0x32 }, L2(16), 1250000 },
 	{ 1, {  1458000, HFPLL, 1, 0, 0x36 }, L2(16), 1275000 },
+#endif // CONFIG_CPU_OVERCLOCK
 #ifdef CONFIG_CPU_MAX_OVERCLOCK
 	{ 1, {  1566000, HFPLL, 1, 0, 0x3A }, L2(16), 1300000 },
 	{ 1, {  1674000, HFPLL, 1, 0, 0x3E }, L2(16), 1300000 },
 #endif // CONFIG_CPU_MAX_OVERCLOCK
-#endif // CONFIG_CPU_OVERCLOCK
 #endif // CONFIG_LOW_CPUCLOCKS
 	{ 0, { 0 } }
 };
@@ -1037,37 +1051,45 @@ static struct acpu_level acpu_freq_tbl_8930_nom[] = {
 	{ 0, { STBY_KHZ, QSB,   0, 0, 0x00 }, L2(0),   850000 },
 #ifdef CONFIG_LOW_CPUCLOCKS
 	{ 1, {   162000, HFPLL, 2, 0, 0x0C }, L2(1),   850000 },
-	{ 1, {   216000, HFPLL, 2, 0, 0x10 }, L2(1),   850000 },
+	{ 0, {   216000, HFPLL, 2, 0, 0x10 }, L2(1),   850000 },
 	{ 1, {   270000, HFPLL, 2, 0, 0x14 }, L2(1),   850000 },
 	{ 1, {   324000, HFPLL, 2, 0, 0x18 }, L2(1),   850000 },
-	{ 1, {   378000, HFPLL, 2, 0, 0x1C }, L2(1),   850000 },
+	{ 0, {   378000, HFPLL, 2, 0, 0x1C }, L2(1),   850000 },
 #else
 	{ 1, {   162000, HFPLL, 2, 0, 0x0C }, L2(1),   850000 },
 #endif
 	{ 1, {   384000, PLL_8, 0, 2, 0x00 }, L2(1),   900000 },
+	{ 0, {   432000, HFPLL, 2, 0, 0x20 }, L2(6),   900000 },
 	{ 1, {   486000, HFPLL, 2, 0, 0x24 }, L2(6),   900000 },
+	{ 0, {   540000, HFPLL, 2, 0, 0x28 }, L2(6),   950000 },
 	{ 1, {   594000, HFPLL, 1, 0, 0x16 }, L2(6),   950000 },
+	{ 0, {   648000, HFPLL, 1, 0, 0x18 }, L2(6),   975000 },
 	{ 1, {   702000, HFPLL, 1, 0, 0x1A }, L2(6),   975000 },
+	{ 0, {   756000, HFPLL, 1, 0, 0x1C }, L2(11), 1000000 },
 	{ 1, {   810000, HFPLL, 1, 0, 0x1E }, L2(11), 1000000 },
+	{ 0, {   864000, HFPLL, 1, 0, 0x20 }, L2(11), 1050000 },
 	{ 1, {   918000, HFPLL, 1, 0, 0x22 }, L2(11), 1050000 },
+	{ 0, {   972000, HFPLL, 1, 0, 0x24 }, L2(11), 1075000 },
 	{ 1, {  1026000, HFPLL, 1, 0, 0x26 }, L2(11), 1075000 },
 #ifdef CONFIG_LOW_CPUCLOCKS
-	{ 1, {  1134000, HFPLL, 1, 0, 0x2A }, L2(17), 1125000 },
+	{ 1, {  1080000, HFPLL, 1, 0, 0x28 }, L2(15), 1125000 },
+	{ 0, {  1134000, HFPLL, 1, 0, 0x2A }, L2(15), 1125000 },
 	{ 1, {  1188000, HFPLL, 1, 0, 0x2C }, L2(17), 1150000 },
 #ifdef CONFIG_CPU_OVERCLOCK
-	{ 1, {  1242000, HFPLL, 1, 0, 0x2E }, L2(17), 1175000 },
+	{ 0, {  1242000, HFPLL, 1, 0, 0x2E }, L2(17), 1175000 },
 	{ 1, {  1350000, HFPLL, 1, 0, 0x32 }, L2(17), 1200000 },
 	{ 1, {  1458000, HFPLL, 1, 0, 0x36 }, L2(17), 1250000 },
+#endif // CONFIG_CPU_OVERCLOCK
 #ifdef CONFIG_CPU_MAX_OVERCLOCK
 	{ 1, {  1566000, HFPLL, 1, 0, 0x3A }, L2(17), 1275000 },
 	{ 1, {  1674000, HFPLL, 1, 0, 0x3E }, L2(17), 1275000 },
 #endif // CONFIG_CPU_MAX_OVERCLOCK
-#endif // CONFIG_CPU_OVERCLOCK
 #else
-	{ 1, {  1134000, HFPLL, 1, 0, 0x2A }, L2(16), 1125000 },
+	{ 1, {  1080000, HFPLL, 1, 0, 0x28 }, L2(14), 1125000 },
+	{ 0, {  1134000, HFPLL, 1, 0, 0x2A }, L2(14), 1125000 },
 	{ 1, {  1188000, HFPLL, 1, 0, 0x2C }, L2(16), 1150000 },
 #ifdef CONFIG_CPU_OVERCLOCK
-	{ 1, {  1242000, HFPLL, 1, 0, 0x2E }, L2(16), 1175000 },
+	{ 0, {  1242000, HFPLL, 1, 0, 0x2E }, L2(16), 1175000 },
 	{ 1, {  1350000, HFPLL, 1, 0, 0x32 }, L2(16), 1200000 },
 	{ 1, {  1458000, HFPLL, 1, 0, 0x36 }, L2(16), 1250000 },
 #ifdef CONFIG_CPU_MAX_OVERCLOCK
@@ -1083,44 +1105,52 @@ static struct acpu_level acpu_freq_tbl_8930_fast[] = {
 	{ 0, { STBY_KHZ, QSB,   0, 0, 0x00 }, L2(0),   800000 },
 #ifdef CONFIG_LOW_CPUCLOCKS
 	{ 1, {   162000, HFPLL, 2, 0, 0x0C }, L2(1),   800000 },
-	{ 1, {   216000, HFPLL, 2, 0, 0x10 }, L2(1),   800000 },
+	{ 0, {   216000, HFPLL, 2, 0, 0x10 }, L2(1),   800000 },
 	{ 1, {   270000, HFPLL, 2, 0, 0x14 }, L2(1),   800000 },
 	{ 1, {   324000, HFPLL, 2, 0, 0x18 }, L2(1),   800000 },
-	{ 1, {   378000, HFPLL, 2, 0, 0x1C }, L2(1),   825000 },
+	{ 0, {   378000, HFPLL, 2, 0, 0x1C }, L2(1),   825000 },
 #else
 	{ 1, {   162000, HFPLL, 2, 0, 0x0C }, L2(1),   800000 },
 #endif
 	{ 1, {   384000, PLL_8, 0, 2, 0x00 }, L2(1),   850000 },
+	{ 0, {   432000, HFPLL, 2, 0, 0x20 }, L2(6),   850000 },
 	{ 1, {   486000, HFPLL, 2, 0, 0x24 }, L2(6),   850000 },
+	{ 0, {   540000, HFPLL, 2, 0, 0x28 }, L2(6),   900000 },
 	{ 1, {   594000, HFPLL, 1, 0, 0x16 }, L2(6),   900000 },
+	{ 0, {   648000, HFPLL, 1, 0, 0x18 }, L2(6),   925000 },
 	{ 1, {   702000, HFPLL, 1, 0, 0x1A }, L2(6),   925000 },
+	{ 0, {   756000, HFPLL, 1, 0, 0x1C }, L2(11),  950000 },
 	{ 1, {   810000, HFPLL, 1, 0, 0x1E }, L2(11),  950000 },
+	{ 0, {   864000, HFPLL, 1, 0, 0x20 }, L2(11), 1000000 },
 	{ 1, {   918000, HFPLL, 1, 0, 0x22 }, L2(11), 1000000 },
+	{ 0, {   972000, HFPLL, 1, 0, 0x24 }, L2(11), 1025000 },
 	{ 1, {  1026000, HFPLL, 1, 0, 0x26 }, L2(11), 1025000 },
 #ifdef CONFIG_LOW_CPUCLOCKS
-	{ 1, {  1134000, HFPLL, 1, 0, 0x2A }, L2(17), 1075000 },
+	{ 1, {  1080000, HFPLL, 1, 0, 0x28 }, L2(15), 1075000 },
+	{ 0, {  1134000, HFPLL, 1, 0, 0x2A }, L2(15), 1075000 },
 	{ 1, {  1188000, HFPLL, 1, 0, 0x2C }, L2(17), 1100000 },
 #ifdef CONFIG_CPU_OVERCLOCK
-	{ 1, {  1242000, HFPLL, 1, 0, 0x2E }, L2(17), 1125000 },
+	{ 0, {  1242000, HFPLL, 1, 0, 0x2E }, L2(17), 1125000 },
 	{ 1, {  1350000, HFPLL, 1, 0, 0x32 }, L2(17), 1150000 },
 	{ 1, {  1458000, HFPLL, 1, 0, 0x36 }, L2(17), 1175000 },
+#endif // CONFIG_CPU_OVERCLOCK
 #ifdef CONFIG_CPU_MAX_OVERCLOCK
 	{ 1, {  1566000, HFPLL, 1, 0, 0x3A }, L2(17), 1200000 },
 	{ 1, {  1674000, HFPLL, 1, 0, 0x3E }, L2(17), 1200000 },
 #endif // CONFIG_CPU_MAX_OVERCLOCK
-#endif // CONFIG_CPU_OVERCLOCK
 #else
-	{ 1, {  1134000, HFPLL, 1, 0, 0x2A }, L2(16), 1075000 },
+	{ 1, {  1080000, HFPLL, 1, 0, 0x28 }, L2(14), 1075000 },
+	{ 0, {  1134000, HFPLL, 1, 0, 0x2A }, L2(14), 1075000 },
 	{ 1, {  1188000, HFPLL, 1, 0, 0x2C }, L2(16), 1100000 },
 #ifdef CONFIG_CPU_OVERCLOCK
-	{ 1, {  1242000, HFPLL, 1, 0, 0x2E }, L2(16), 1125000 },
+	{ 0, {  1242000, HFPLL, 1, 0, 0x2E }, L2(16), 1125000 },
 	{ 1, {  1350000, HFPLL, 1, 0, 0x32 }, L2(16), 1115000 },
 	{ 1, {  1458000, HFPLL, 1, 0, 0x36 }, L2(16), 1175000 },
+#endif // CONFIG_CPU_OVERCLOCK
 #ifdef CONFIG_CPU_MAX_OVERCLOCK
 	{ 1, {  1566000, HFPLL, 1, 0, 0x3A }, L2(16), 1200000 },
 	{ 1, {  1674000, HFPLL, 1, 0, 0x3E }, L2(16), 1200000 },
 #endif // CONFIG_CPU_MAX_OVERCLOCK
-#endif // CONFIG_CPU_OVERCLOCK
 #endif
 	{ 0, { 0 } }
 };
@@ -1356,15 +1386,15 @@ static void hfpll_enable(struct scalable *sc, bool skip_regulators)
 					2050000,
 					sc->vreg[VREG_HFPLL_A].max_vdd, 0);
 			if (rc)
-				/*pr_err("%s regulator enable failed (%d)\n",
-					sc->vreg[VREG_HFPLL_A].name, rc)*/;
+				pr_err("%s regulator enable failed (%d)\n",
+					sc->vreg[VREG_HFPLL_A].name, rc);
 		}
 		rc = rpm_vreg_set_voltage(sc->vreg[VREG_HFPLL_B].rpm_vreg_id,
 				sc->vreg[VREG_HFPLL_B].rpm_vreg_voter, 1800000,
 				sc->vreg[VREG_HFPLL_B].max_vdd, 0);
 		if (rc)
-			/*pr_err("%s regulator enable failed (%d)\n",
-				sc->vreg[VREG_HFPLL_B].name, rc)*/;
+			pr_err("%s regulator enable failed (%d)\n",
+				sc->vreg[VREG_HFPLL_B].name, rc);
 	}
 	
 	writel_relaxed(0x2, sc->hfpll_base + HFPLL_MODE);
@@ -1394,8 +1424,8 @@ static void hfpll_disable(struct scalable *sc, bool skip_regulators)
 				sc->vreg[VREG_HFPLL_B].rpm_vreg_voter, 0,
 				0, 0);
 		if (rc)
-			/*pr_err("%s regulator enable failed (%d)\n",
-				sc->vreg[VREG_HFPLL_B].name, rc)*/;
+			pr_err("%s regulator enable failed (%d)\n",
+				sc->vreg[VREG_HFPLL_B].name, rc);
 
 		if (cpu_is_msm8960()) {
 			rc = rpm_vreg_set_voltage(
@@ -1403,8 +1433,8 @@ static void hfpll_disable(struct scalable *sc, bool skip_regulators)
 					sc->vreg[VREG_HFPLL_A].rpm_vreg_voter,
 					0, 0, 0);
 			if (rc)
-				/*pr_err("%s regulator enable failed (%d)\n",
-					sc->vreg[VREG_HFPLL_A].name, rc)*/;
+				pr_err("%s regulator enable failed (%d)\n",
+					sc->vreg[VREG_HFPLL_A].name, rc);
 		}
 	}
 }
@@ -1438,14 +1468,14 @@ static void set_bus_bw(unsigned int bw)
 
 	
 	if (bw >= ARRAY_SIZE(bw_level_tbl)) {
-		//pr_err("invalid bandwidth request (%d)\n", bw);
+		pr_err("invalid bandwidth request (%d)\n", bw);
 		return;
 	}
 
 	
 	ret = msm_bus_scale_client_update_request(bus_perf_client, bw);
 	if (ret)
-		/*pr_err("bandwidth request failed (%d)\n", ret)*/;
+		pr_err("bandwidth request failed (%d)\n", ret);
 }
 
 static void set_speed(struct scalable *sc, struct core_speed *tgt_s,
@@ -1506,8 +1536,8 @@ static int increase_vdd(int cpu, unsigned int vdd_core, unsigned int vdd_mem,
 				sc->vreg[VREG_MEM].rpm_vreg_voter, vdd_mem,
 				sc->vreg[VREG_MEM].max_vdd, 0);
 		if (rc) {
-			/*pr_err("%s increase failed (%d)\n",
-				sc->vreg[VREG_MEM].name, rc);*/
+			pr_err("%s increase failed (%d)\n",
+				sc->vreg[VREG_MEM].name, rc);
 			return rc;
 		}
 		 sc->vreg[VREG_MEM].cur_vdd = vdd_mem;
@@ -1519,8 +1549,8 @@ static int increase_vdd(int cpu, unsigned int vdd_core, unsigned int vdd_mem,
 				sc->vreg[VREG_DIG].rpm_vreg_voter, vdd_dig,
 				sc->vreg[VREG_DIG].max_vdd, 0);
 		if (rc) {
-			/*pr_err("%s increase failed (%d)\n",
-				sc->vreg[VREG_DIG].name, rc);*/
+			pr_err("%s increase failed (%d)\n",
+				sc->vreg[VREG_DIG].name, rc);
 			return rc;
 		}
 		sc->vreg[VREG_DIG].cur_vdd = vdd_dig;
@@ -1531,8 +1561,8 @@ static int increase_vdd(int cpu, unsigned int vdd_core, unsigned int vdd_mem,
 		rc = regulator_set_voltage(sc->vreg[VREG_CORE].reg, vdd_core,
 					   sc->vreg[VREG_CORE].max_vdd);
 		if (rc) {
-			/*pr_err("%s increase failed (%d)\n",
-				sc->vreg[VREG_CORE].name, rc);*/
+			pr_err("%s increase failed (%d)\n",
+				sc->vreg[VREG_CORE].name, rc);
 			return rc;
 		}
 		sc->vreg[VREG_CORE].cur_vdd = vdd_core;
@@ -1552,8 +1582,8 @@ static void decrease_vdd(int cpu, unsigned int vdd_core, unsigned int vdd_mem,
 		ret = regulator_set_voltage(sc->vreg[VREG_CORE].reg, vdd_core,
 					    sc->vreg[VREG_CORE].max_vdd);
 		if (ret) {
-			/*pr_err("%s decrease failed (%d)\n",
-			       sc->vreg[VREG_CORE].name, ret);*/
+			pr_err("%s decrease failed (%d)\n",
+			       sc->vreg[VREG_CORE].name, ret);
 			return;
 		}
 		sc->vreg[VREG_CORE].cur_vdd = vdd_core;
@@ -1565,8 +1595,8 @@ static void decrease_vdd(int cpu, unsigned int vdd_core, unsigned int vdd_mem,
 				sc->vreg[VREG_DIG].rpm_vreg_voter, vdd_dig,
 				sc->vreg[VREG_DIG].max_vdd, 0);
 		if (ret) {
-			/*pr_err("%s decrease failed (%d)\n",
-				sc->vreg[VREG_DIG].name, ret);*/
+			pr_err("%s decrease failed (%d)\n",
+				sc->vreg[VREG_DIG].name, ret);
 			return;
 		}
 		sc->vreg[VREG_DIG].cur_vdd = vdd_dig;
@@ -1577,8 +1607,8 @@ static void decrease_vdd(int cpu, unsigned int vdd_core, unsigned int vdd_mem,
 				sc->vreg[VREG_MEM].rpm_vreg_voter, vdd_mem,
 				sc->vreg[VREG_MEM].max_vdd, 0);
 		if (ret) {
-			/*pr_err("%s decrease failed (%d)\n",
-				sc->vreg[VREG_MEM].name, ret);*/
+			pr_err("%s decrease failed (%d)\n",
+				sc->vreg[VREG_MEM].name, ret);
 			return;
 		}
 		 sc->vreg[VREG_MEM].cur_vdd = vdd_mem;
@@ -1623,10 +1653,10 @@ static int acpuclk_8960_set_rate(int cpu, unsigned long rate,
 
 	if (reason == SETRATE_CPUFREQ) {
 		if (cpu_is_offline(cpu)) {
-			//pr_info("don't change frequency for an offline CPU%d\n", cpu);
+			pr_debug("don't change frequency for an offline CPU%d\n", cpu);
 			return 0;
 		} else if (smp_processor_id() != cpu) {
-			//pr_info("CPU%d don't change frequency for CPU%d\n", smp_processor_id(), cpu);
+			pr_debug("CPU%d don't change frequency for CPU%d\n", smp_processor_id(), cpu);
 			return 0;
 		}
 	}
@@ -1671,17 +1701,17 @@ static int acpuclk_8960_set_rate(int cpu, unsigned long rate,
 			goto out;
 	}
 
-	/*pr_debug("Switching from ACPU%d rate %u KHz -> %u KHz\n",
-		cpu, strt_acpu_s->khz, tgt_acpu_s->khz);*/
+	pr_debug("Switching from ACPU%d rate %u KHz -> %u KHz\n",
+		cpu, strt_acpu_s->khz, tgt_acpu_s->khz);
 	udelay(60);
 	set_acpuclk_foot_print(cpu, 0x3);
 
 	if (reason == SETRATE_CPUFREQ) {
 		if (cpu_is_offline(cpu)) {
-			//pr_info("don't set_speed for an offline CPU%d\n", cpu);
+			pr_debug("don't set_speed for an offline CPU%d\n", cpu);
 			goto out;
 		} else if (smp_processor_id() != cpu) {
-			//pr_info("CPU%d don't set_speed for CPU%d\n", smp_processor_id(), cpu);
+			pr_debug("CPU%d don't set_speed for CPU%d\n", smp_processor_id(), cpu);
 			goto out;
 		}
 	}
@@ -1715,7 +1745,7 @@ static int acpuclk_8960_set_rate(int cpu, unsigned long rate,
 
 	set_acpuclk_foot_print(cpu, 0x7);
 
-	//pr_debug("ACPU%d speed change complete\n", cpu);
+	pr_debug("ACPU%d speed change complete\n", cpu);
 
 out:
 	if (reason == SETRATE_CPUFREQ || reason == SETRATE_HOTPLUG)
@@ -1728,7 +1758,7 @@ out:
 
 static void __cpuinit hfpll_init(struct scalable *sc, struct core_speed *tgt_s)
 {
-	//pr_debug("Initializing HFPLL%d\n", sc - scalable);
+	pr_debug("Initializing HFPLL%d\n", sc - scalable);
 
 	
 	hfpll_disable(sc, 1);
@@ -1760,8 +1790,8 @@ static void __cpuinit regulator_init(int cpu, struct acpu_level *lvl)
 			sc->vreg[VREG_MEM].rpm_vreg_voter, vdd_mem,
 			sc->vreg[VREG_MEM].max_vdd, 0);
 	if (ret) {
-		/*pr_err("%s initialization failed (%d)\n",
-			sc->vreg[VREG_MEM].name, ret);*/
+		pr_err("%s initialization failed (%d)\n",
+			sc->vreg[VREG_MEM].name, ret);
 		BUG();
 	}
 	sc->vreg[VREG_MEM].cur_vdd  = vdd_mem;
@@ -1771,8 +1801,8 @@ static void __cpuinit regulator_init(int cpu, struct acpu_level *lvl)
 			sc->vreg[VREG_DIG].rpm_vreg_voter, vdd_dig,
 			sc->vreg[VREG_DIG].max_vdd, 0);
 	if (ret) {
-		/*pr_err("%s initialization failed (%d)\n",
-			sc->vreg[VREG_DIG].name, ret);*/
+		pr_err("%s initialization failed (%d)\n",
+			sc->vreg[VREG_DIG].name, ret);
 		BUG();
 	}
 	sc->vreg[VREG_DIG].cur_vdd  = vdd_dig;
@@ -1781,24 +1811,24 @@ static void __cpuinit regulator_init(int cpu, struct acpu_level *lvl)
 	sc->vreg[VREG_CORE].reg = regulator_get(NULL,
 				  sc->vreg[VREG_CORE].name);
 	if (IS_ERR(sc->vreg[VREG_CORE].reg)) {
-		/*pr_err("regulator_get(%s) failed (%ld)\n",
+		pr_err("regulator_get(%s) failed (%ld)\n",
 		       sc->vreg[VREG_CORE].name,
-		       PTR_ERR(sc->vreg[VREG_CORE].reg));*/
+		       PTR_ERR(sc->vreg[VREG_CORE].reg));
 		BUG();
 	}
 	vdd_core = calculate_vdd_core(lvl);
 	ret = regulator_set_voltage(sc->vreg[VREG_CORE].reg, vdd_core,
 				    sc->vreg[VREG_CORE].max_vdd);
 	if (ret) {
-		/*pr_err("%s initialization failed (%d)\n",
-			sc->vreg[VREG_CORE].name, ret);*/
+		pr_err("%s initialization failed (%d)\n",
+			sc->vreg[VREG_CORE].name, ret);
 		BUG();
 	}
 	sc->vreg[VREG_CORE].cur_vdd = vdd_core;
 	ret = regulator_enable(sc->vreg[VREG_CORE].reg);
 	if (ret) {
-		/*pr_err("regulator_enable(%s) failed (%d)\n",
-		       sc->vreg[VREG_CORE].name, ret);*/
+		pr_err("regulator_enable(%s) failed (%d)\n",
+		       sc->vreg[VREG_CORE].name, ret);
 		BUG();
 	}
 	sc->regulators_initialized = true;
@@ -1854,13 +1884,13 @@ static void __init bus_init(unsigned int init_bw)
 
 	bus_perf_client = msm_bus_scale_register_client(&bus_client_pdata);
 	if (!bus_perf_client) {
-		//pr_err("unable to register bus client\n");
+		pr_err("unable to register bus client\n");
 		BUG();
 	}
 
 	ret = msm_bus_scale_client_update_request(bus_perf_client, init_bw);
 	if (ret)
-		/*pr_err("initial bandwidth request failed (%d)\n", ret)*/;
+		pr_err("initial bandwidth request failed (%d)\n", ret);
 }
 
 #ifdef CONFIG_USERSPACE_VOLTAGE_CONTROL
@@ -1904,13 +1934,13 @@ void acpuclk_set_vdd(unsigned int khz, int vdd_uv) {
 
     acpu_freq_tbl[i].vdd_core = new_vdd_uv;
   }
-  //pr_warn("User voltage table modified!\n");
+  pr_warn("User voltage table modified!\n");
   mutex_unlock(&driver_lock);
 }
 #endif
 
 #ifdef CONFIG_CPU_FREQ_MSM
-static struct cpufreq_frequency_table freq_table[NR_CPUS][30];
+static struct cpufreq_frequency_table freq_table[NR_CPUS][MAX_FREQ_STEPS];
 
 static void __init cpufreq_table_init(void)
 {
@@ -1934,8 +1964,8 @@ static void __init cpufreq_table_init(void)
 		freq_table[cpu][freq_cnt].index = freq_cnt;
 		freq_table[cpu][freq_cnt].frequency = CPUFREQ_TABLE_END;
 
-		/*pr_info("CPU%d: %d scaling frequencies supported.\n",
-			cpu, freq_cnt);*/
+		pr_debug("CPU%d: %d scaling frequencies supported.\n",
+			cpu, freq_cnt);
 
 		
 		cpufreq_frequency_table_get_attr(freq_table[cpu], cpu);
@@ -1967,7 +1997,7 @@ static int __cpuinit acpuclock_cpu_callback(struct notifier_block *nfb,
 	case CPU_DEAD:
 	case CPU_DEAD_FROZEN:
 		prev_khz[cpu] = acpuclk_8960_get_rate(cpu);
-		//pr_info("CPU%d unplug, freq = %d\n", cpu, prev_khz[cpu]);
+		pr_debug("CPU%d unplug, freq = %d\n", cpu, prev_khz[cpu]);
 		
 	case CPU_UP_CANCELED:
 	case CPU_UP_CANCELED_FROZEN:
@@ -1985,7 +2015,7 @@ static int __cpuinit acpuclock_cpu_callback(struct notifier_block *nfb,
 					      SETRATE_HOTPLUG);
 		if (!scalable[cpu].regulators_initialized)
 			regulator_init(cpu, max_acpu_level);
-		//pr_info("CPU%d hotplug prepare, freq = %d\n", cpu, prev_khz[cpu]);
+		pr_debug("CPU%d hotplug prepare, freq = %d\n", cpu, prev_khz[cpu]);
 		break;
 	case CPU_STARTING:
 	case CPU_STARTING_FROZEN:
@@ -1997,7 +2027,7 @@ static int __cpuinit acpuclock_cpu_callback(struct notifier_block *nfb,
 		}
 		break;
 	case CPU_ONLINE:
-		/*pr_info("CPU%d hotplug done, freq = %d\n", cpu, prev_khz[cpu])*/;
+		pr_debug("CPU%d hotplug done, freq = %d\n", cpu, prev_khz[cpu]);
 	default:
 		break;
 	}
@@ -2013,7 +2043,7 @@ static const int krait_needs_vmin(void)
 {
 	unsigned int cpuid = read_cpuid_id();
 
-	//pr_info("%s: cpuid is 0x%x\n", __func__, cpuid);
+	pr_debug("%s: cpuid is 0x%x\n", __func__, cpuid);
 	switch (cpuid) {
 	case 0x511F04D0:
 	case 0x511F04D1:
@@ -2047,15 +2077,15 @@ static enum pvs __init get_pvs(void)
 
 	
 	if(kernel_flag & KERNEL_FLAG_PVS_SLOW_CPU){
-		//pr_info("ACPU PVS: Force SLOW by writeconfig\n");
+		pr_debug("ACPU PVS: Force SLOW by writeconfig\n");
 		return PVS_SLOW;
 	}
 	else if (kernel_flag & KERNEL_FLAG_PVS_NOM_CPU){
-		//pr_info("ACPU PVS: Force NOMINAL by writeconfig\n");
+		pr_debug("ACPU PVS: Force NOMINAL by writeconfig\n");
 		return PVS_NOM;
 	}
 	else if (kernel_flag & KERNEL_FLAG_PVS_FAST_CPU){
-		//pr_info("ACPU PVS: Force FAST by writeconfig\n");
+		pr_debug("ACPU PVS: Force FAST by writeconfig\n");
 		return PVS_FAST;
 	}
 
@@ -2067,21 +2097,21 @@ static enum pvs __init get_pvs(void)
 	switch (pvs) {
 	case 0x0:
 	case 0x7:
-		//pr_info("ACPU PVS: Slow\n");
+		pr_debug("ACPU PVS: Slow\n");
 		return PVS_SLOW;
 	case 0x1:
-		//pr_info("ACPU PVS: Nominal\n");
+		pr_debug("ACPU PVS: Nominal\n");
 		return PVS_NOM;
 	case 0x3:
-		//pr_info("ACPU PVS: Fast\n");
+		pr_debug("ACPU PVS: Fast\n");
 		return PVS_FAST;
 	case 0x4:
 		if (cpu_is_apq8064()) {
-			//pr_info("ACPU PVS: Faster\n");
+			pr_debug("ACPU PVS: Faster\n");
 			return  PVS_FASTER;
 		}
 	default:
-		//pr_warn("ACPU PVS: Unknown. Defaulting to slow\n");
+		pr_warn("ACPU PVS: Unknown. Defaulting to slow\n");
 		return PVS_SLOW;
 	}
 }
@@ -2097,9 +2127,9 @@ static int __init get_pvs_bin(void)
 
 	if (pvs_bin == 0x7) {
 		pvs_bin = 0;
-		//pr_info("ACPU PVS: Defaulting to %d\n", pvs_bin);
+		pr_debug("ACPU PVS: Defaulting to %d\n", pvs_bin);
 	} else {
-		/*pr_info("ACPU PVS: %d\n", pvs_bin)*/;
+		pr_debug("ACPU PVS: %d\n", pvs_bin);
 	}
 
 	return pvs_bin;
@@ -2116,9 +2146,9 @@ int __init get_speed_bin(void)
 
 	if (speed_bin == 0xF) {
 		speed_bin = 0;
-		//pr_info("SPEED BIN: Defaulting to %d\n", speed_bin);
+		pr_debug("SPEED BIN: Defaulting to %d\n", speed_bin);
 	} else {
-		/*pr_info("SPEED BIN: %d\n", speed_bin)*/;
+		pr_debug("SPEED BIN: %d\n", speed_bin);
 	}
 
 	return speed_bin;
@@ -2208,10 +2238,10 @@ static void __init select_freq_plan(void)
 	}
 	BUG_ON(!acpu_freq_tbl);
 	if (krait_needs_vmin()) {
-		//pr_info("Applying min 1.15v fix for Krait Errata 26\n");
+		pr_debug("Applying min 1.15v fix for Krait Errata 26\n");
 		kraitv2_apply_vmin(acpu_freq_tbl);
 	} else {
-		/*pr_info("No need to apply min 1.15v fix for Krait Errata 26\n")*/;
+		pr_debug("No need to apply min 1.15v fix for Krait Errata 26\n");
 	}
 
 	
@@ -2234,7 +2264,7 @@ static void __init select_freq_plan(void)
 #endif
 			max_acpu_level = l;
 	BUG_ON(!max_acpu_level);
-	//pr_info("Max ACPU freq: %u KHz\n", max_acpu_level->speed.khz);
+	pr_debug("Max ACPU freq: %u KHz\n", max_acpu_level->speed.khz);
 }
 
 static struct acpuclk_data acpuclk_8960_data = {

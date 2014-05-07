@@ -124,11 +124,6 @@
 #include <mach/perflock.h>
 #endif
 
-
-#ifdef CONFIG_CPU_FREQ_GOV_ONDEMAND_2_PHASE
-int set_two_phase_freq(int cpufreq);
-#endif
-
 static struct platform_device msm_fm_platform_init = {
 	.name = "iris_fm",
 	.id   = -1,
@@ -509,9 +504,9 @@ static void __init reserve_ion_memory(void)
 			reusable_count += (data->reusable) ? 1 : 0;
 
 			if (data->reusable && reusable_count > 1) {
-				/*pr_err("%s: Too many heaps specified as "
+				pr_err("%s: Too many heaps specified as "
 					"reusable. Heap %s was not configured "
-					"as reusable.\n", __func__, heap->name);*/
+					"as reusable.\n", __func__, heap->name);
 				data->reusable = 0;
 			}
 		}
@@ -671,10 +666,10 @@ static void __init locate_unstable_memory(void)
 	msm8930_reserve_info.low_unstable_address = mb->start -
 					MIN_MEMORY_BLOCK_SIZE + mb->size;
 	msm8930_reserve_info.max_unstable_size = MIN_MEMORY_BLOCK_SIZE;
-	/*pr_info("low unstable address %lx max size %lx bank size %lx\n",
+	pr_debug("low unstable address %lx max size %lx bank size %lx\n",
 		msm8930_reserve_info.low_unstable_address,
 		msm8930_reserve_info.max_unstable_size,
-		msm8930_reserve_info.bank_size);*/
+		msm8930_reserve_info.bank_size);
 	return;
 #endif
 no_dmm:
@@ -687,8 +682,8 @@ static void __init place_movable_zone(void)
 #ifdef CONFIG_ENABLE_DMM
 	movable_reserved_start = msm8930_reserve_info.low_unstable_address;
 	movable_reserved_size = msm8930_reserve_info.max_unstable_size;
-	/*pr_info("movable zone start %lx size %lx\n",
-		movable_reserved_start, movable_reserved_size);*/
+	pr_debug("movable zone start %lx size %lx\n",
+		movable_reserved_start, movable_reserved_size);
 #endif
 }
 
@@ -707,12 +702,10 @@ static void __init k2_ul_reserve(void)
 		if (reserve_info->fixed_area_size) {
 			msm8930_fmem_pdata.phys =
 				reserve_info->fixed_area_start + MSM_MM_FW_SIZE;
-                /*
-		pr_info("mm fw at %lx (fixed) size %x\n",
+		pr_debug("mm fw at %lx (fixed) size %x\n",
 			reserve_info->fixed_area_start, MSM_MM_FW_SIZE);
-		pr_info("fmem start %lx (fixed) size %lx\n",
+		pr_debug("fmem start %lx (fixed) size %lx\n",
 			msm8930_fmem_pdata.phys, msm8930_fmem_pdata.size);
-                */
 		}
 #endif
 	}
@@ -1446,12 +1439,12 @@ int64_t k2_ul_get_usbid_adc(void)
 
 	err = pm8xxx_adc_mpp_config_read(PM8XXX_AMUX_MPP_3, ADC_MPP_1_AMUX6, &result);
 	if (err) {
-		//pr_info("[CABLE] %s: get adc fail, err %d\n", __func__, err);
+		pr_debug("[CABLE] %s: get adc fail, err %d\n", __func__, err);
 		return err;
 	}
-	/*pr_info("[CABLE] chan=%d, adc_code=%d, measurement=%lld, \
+	pr_debug("[CABLE] chan=%d, adc_code=%d, measurement=%lld, \
 			physical=%lld\n", result.chan, result.adc_code,
-			result.measurement, result.physical);*/
+			result.measurement, result.physical);
 	adc = result.physical;
 	return adc/1000;
 }
@@ -1474,10 +1467,10 @@ void config_k2_ul_usb_id_gpios(bool output)
 	if (output) {
 		gpio_tlmm_config(usb_ID_PIN_ouput_table[0], GPIO_CFG_ENABLE);
 		gpio_set_value(MSM_USB_ID1, 1);
-		//pr_info("[CABLE] %s: %d output high\n",  __func__, MSM_USB_ID1);
+		pr_debug("[CABLE] %s: %d output high\n",  __func__, MSM_USB_ID1);
 	} else {
 		gpio_tlmm_config(usb_ID_PIN_input_table[0], GPIO_CFG_ENABLE);
-		//pr_info("[CABLE] %s: %d input none pull\n",  __func__, MSM_USB_ID1);
+		pr_debug("[CABLE] %s: %d input none pull\n",  __func__, MSM_USB_ID1);
 	}
 }
 
@@ -1504,8 +1497,8 @@ void k2ul_cable_detect_register(void)
 
 void pm8xxx_adc_device_driver_register(void)
 {
-	/*pr_info("%s: Register PM8XXX ADC device. rev: %d\n",
-		__func__, system_rev);*/
+	pr_debug("%s: Register PM8XXX ADC device. rev: %d\n",
+		__func__, system_rev);
 	k2ul_cable_detect_register();
 }
 
@@ -1635,7 +1628,7 @@ static void __init k2_ul_map_io(void)
 	msm_map_msm8930_io();
 
 	if (socinfo_init() < 0)
-		/*pr_err("socinfo_init() failed!\n")*/;
+		pr_err("socinfo_init() failed!\n");
 }
 
 static void __init k2_ul_init_irq(void)
@@ -1661,7 +1654,7 @@ static int capella_pl_sensor_lpm_power(uint8_t enable)
 	if (pl_reg_l9 == NULL) {
 		pl_reg_l9 = regulator_get(NULL, "8038_l9");
 		if (IS_ERR(pl_reg_l9)) {
-			//pr_err("[PS][cm3629] %s: Unable to get '8038_l9' \n", __func__);
+			pr_err("[PS][cm3629] %s: Unable to get '8038_l9' \n", __func__);
 			mutex_unlock(&sensor_lock);
 			return -ENODEV;
 		}
@@ -1669,15 +1662,15 @@ static int capella_pl_sensor_lpm_power(uint8_t enable)
 	if (enable == 1) {
 		rc = regulator_set_optimum_mode(pl_reg_l9, 100);
 		if (rc < 0)
-			/*pr_err("[PS][cm3629] %s: enter lmp,set_optimum_mode l6 failed, rc=%d\n", __func__, rc)*/;
+			pr_err("[PS][cm3629] %s: enter lmp,set_optimum_mode l6 failed, rc=%d\n", __func__, rc);
 		else
-			/*pr_info("[PS][cm3629] %s: enter lmp,OK\n", __func__)*/;
+			pr_debug("[PS][cm3629] %s: enter lmp,OK\n", __func__);
 	} else {
 		rc = regulator_set_optimum_mode(pl_reg_l9, 100000);
 		if (rc < 0)
-			/*pr_err("[PS][cm3629] %s: leave lmp,set_optimum_mode l6 failed, rc=%d\n", __func__, rc)*/;
+			pr_err("[PS][cm3629] %s: leave lmp,set_optimum_mode l6 failed, rc=%d\n", __func__, rc);
 		else
-			/*pr_info("[PS][cm3629] %s: leave lmp,OK\n", __func__)*/;
+			pr_debug("[PS][cm3629] %s: leave lmp,OK\n", __func__);
 		msleep(10);
 	}
 	mutex_unlock(&sensor_lock);
@@ -1692,7 +1685,7 @@ static int cm3629_power(int ls_or_ps, uint8_t enable)
 	if (pl_reg_l9 == NULL) {
 		pl_reg_l9 = regulator_get(NULL, "8038_l9");
 		if (IS_ERR(pl_reg_l9)) {
-			//pr_err("[PS][cm3629] %s: Unable to get '8038_l9' \n", __func__);
+			pr_err("[PS][cm3629] %s: Unable to get '8038_l9' \n", __func__);
 			mutex_unlock(&sensor_lock);
 			return -ENODEV;
 		}
@@ -1700,13 +1693,13 @@ static int cm3629_power(int ls_or_ps, uint8_t enable)
 	if (enable == 1) {
 		rc = regulator_set_voltage(pl_reg_l9, 2850000, 2850000);
 		if (rc)
-			/*pr_err("[PS][cm3629] %s: unable to regulator_set_voltage, rc:%d\n", __func__, rc)*/;
+			pr_err("[PS][cm3629] %s: unable to regulator_set_voltage, rc:%d\n", __func__, rc);
 
 		rc = regulator_enable(pl_reg_l9);
 		if (rc)
-			/*pr_err("[PS][cm3629]'%s' regulator enable L9 failed, rc=%d\n", __func__,rc)*/;
+			pr_err("[PS][cm3629]'%s' regulator enable L9 failed, rc=%d\n", __func__,rc);
 		else
-			/*pr_info("[PS][cm3629]'%s' L9 power on\n", __func__)*/;
+			pr_debug("[PS][cm3629]'%s' L9 power on\n", __func__);
 	}
 	mutex_unlock(&sensor_lock);
 	return rc;
@@ -1856,13 +1849,13 @@ static int usb_diag_update_pid_and_serial_num(uint32_t pid, const char *snum)
 
 	dload = ioremap(DLOAD_USB_BASE_ADD, sizeof(*dload));
 	if (!dload) {
-		/*pr_err("%s: cannot remap I/O memory region: %08x\n",
-					__func__, DLOAD_USB_BASE_ADD);*/
+		pr_err("%s: cannot remap I/O memory region: %08x\n",
+					__func__, DLOAD_USB_BASE_ADD);
 		return -ENXIO;
 	}
 
-	/*pr_debug("%s: dload:%p pid:%x serial_num:%s\n",
-				__func__, dload, pid, snum);*/
+	pr_debug("%s: dload:%p pid:%x serial_num:%s\n",
+				__func__, dload, pid, snum);
 	
 	dload->magic_struct.pid = PID_MAGIC_ID;
 	dload->pid = pid;
@@ -1909,7 +1902,7 @@ static struct platform_device android_usb_device = {
 
 void k2_ul_add_usb_devices(void)
 {
-	//printk(KERN_INFO "[USB] %s rev: %d\n", __func__, system_rev);
+	pr_debug(KERN_INFO "[USB] %s rev: %d\n", __func__, system_rev);
 
 	gpio_tlmm_config(usb_ID_otg_PIN_table[0], GPIO_CFG_ENABLE);
 
@@ -1934,8 +1927,8 @@ void k2_ul_add_usb_devices(void)
 	platform_device_register(&msm8960_device_gadget_peripheral);
 	platform_device_register(&android_usb_device);
 
-	/*printk(KERN_INFO "[USB] %s: OTG_PMIC_CONTROL in rev: %d\n",
-			__func__, system_rev);*/
+	pr_debug(KERN_INFO "[USB] %s: OTG_PMIC_CONTROL in rev: %d\n",
+			__func__, system_rev);
 }
 
 
@@ -2121,7 +2114,7 @@ static void syn_init_vkeys_k2(void)
 	if (syn_properties_kobj)
 		rc = sysfs_create_group(syn_properties_kobj, &syn_properties_attr_group);
 	if (!syn_properties_kobj || rc)
-		/*pr_err("%s: failed to create board_properties\n", __func__)*/;
+		pr_err("%s: failed to create board_properties\n", __func__);
 
 	return;
 }
@@ -2491,26 +2484,26 @@ static void headset_init(void)
 	}
 	ret = gpio_request(MSM_V_HSMIC_2V85_EN, "headset_mic_bias");
 	if (ret) {
-		//pr_err("[HS_BOARD]gpio_request for %d gpio failed rc(%d)\n", MSM_V_HSMIC_2V85_EN, ret);
+		pr_err("[HS_BOARD]gpio_request for %d gpio failed rc(%d)\n", MSM_V_HSMIC_2V85_EN, ret);
 		return;
 	}
 
 	ret = gpio_direction_output(MSM_V_HSMIC_2V85_EN, 0);
 	if (ret) {
-		//pr_err("[HS_BOARD]gpio_direction_output failed for %d gpio rc(%d)\n",MSM_V_HSMIC_2V85_EN, ret);
+		pr_err("[HS_BOARD]gpio_direction_output failed for %d gpio rc(%d)\n",MSM_V_HSMIC_2V85_EN, ret);
 		return;
 	}
 	gpio_free(MSM_V_HSMIC_2V85_EN);
 
 	ret = gpio_request(MSM_AUD_LS_EN, "1wire_level_en");
 	if (ret) {
-		//pr_err("[HS_BOARD]gpio_request for %d gpio failed rc(%d)\n", MSM_AUD_LS_EN, ret);
+		pr_err("[HS_BOARD]gpio_request for %d gpio failed rc(%d)\n", MSM_AUD_LS_EN, ret);
 		return;
 	}
 
 	ret = gpio_direction_output(MSM_AUD_LS_EN, 1);
 	if (ret) {
-		//pr_err("[HS_BOARD]gpio_direction_output failed for %d gpio rc(%d)\n", MSM_AUD_LS_EN, ret);
+		pr_err("[HS_BOARD]gpio_direction_output failed for %d gpio rc(%d)\n", MSM_AUD_LS_EN, ret);
 		return;
 	}
 	gpio_free(MSM_AUD_LS_EN);
@@ -2524,29 +2517,29 @@ static void headset_power(int enable)
 		gpio_tlmm_config(headset_cpu_gpio[i], GPIO_CFG_ENABLE);
 	}
 
-	//pr_info("[HS_BOARD]%s mic bias\n", enable ? "Enable" : "Disable");
+	pr_debug("[HS_BOARD]%s mic bias\n", enable ? "Enable" : "Disable");
 	ret = gpio_request(MSM_V_HSMIC_2V85_EN, "headset_mic_bias");
 	if (ret) {
-		//pr_err("[HS_BOARD]gpio_request for %d gpio failed rc(%d)\n", MSM_V_HSMIC_2V85_EN, ret);
+		pr_err("[HS_BOARD]gpio_request for %d gpio failed rc(%d)\n", MSM_V_HSMIC_2V85_EN, ret);
 		return;
 	}
 
 	ret = gpio_direction_output(MSM_V_HSMIC_2V85_EN, enable);
 	if (ret) {
-		//pr_err("[HS_BOARD]gpio_direction_output failed for %d gpio rc(%d)\n",MSM_V_HSMIC_2V85_EN, ret);
+		pr_err("[HS_BOARD]gpio_direction_output failed for %d gpio rc(%d)\n",MSM_V_HSMIC_2V85_EN, ret);
 		return;
 	}
 	gpio_free(MSM_V_HSMIC_2V85_EN);
 
 	ret = gpio_request(MSM_AUD_LS_EN, "1wire_level_en");
 	if (ret) {
-		//pr_err("[HS_BOARD]gpio_request for %d gpio failed rc(%d)\n", MSM_AUD_LS_EN, ret);
+		pr_err("[HS_BOARD]gpio_request for %d gpio failed rc(%d)\n", MSM_AUD_LS_EN, ret);
 		return;
 	}
 
 	ret = gpio_direction_output(MSM_AUD_LS_EN, 1);
 	if (ret) {
-		//pr_err("[HS_BOARD]gpio_direction_output failed for %d gpio rc(%d)\n", MSM_AUD_LS_EN, ret);
+		pr_err("[HS_BOARD]gpio_direction_output failed for %d gpio rc(%d)\n", MSM_AUD_LS_EN, ret);
 		return;
 	}
 	gpio_free(MSM_AUD_LS_EN);
@@ -2576,13 +2569,13 @@ static struct platform_device htc_headset_mgr = {
 
 static void headset_device_register(void)
 {
-	//pr_info("[HS_BOARD] (%s) Headset device register\n", __func__);
+	pr_debug("[HS_BOARD] (%s) Headset device register\n", __func__);
 	platform_device_register(&htc_headset_mgr);
 }
 
 static void gsbi_qup_i2c_gpio_config(int adap_id, int config_type)
 {
-	//printk(KERN_INFO "%s(): adap_id = %d, config_type = %d \n", __func__, adap_id, config_type);
+	pr_debug(KERN_INFO "%s(): adap_id = %d, config_type = %d \n", __func__, adap_id, config_type);
 
 	if ((adap_id == MSM_8930_GSBI3_QUP_I2C_BUS_ID) && (config_type == 1)) {
 		gpio_tlmm_config(gsbi3_gpio_table[0], GPIO_CFG_ENABLE);
@@ -2684,20 +2677,14 @@ static struct platform_device msm_tsens_device = {
 
 static struct msm_thermal_data msm_thermal_pdata = {
 	.sensor_id = 9,
-	.poll_ms = 250,
-#ifdef CONFIG_CPU_MAX_OVERCLOCK
+	.poll_ms = DEFAULT_POLLING_MS,
         .limit_temp_degC = 70,
-#else
-        .limit_temp_degC = 60,
-#endif
+	.temp_hysteresis_degC = 10,
+	.freq_step = 2,
 #ifdef CONFIG_INTELLI_THERMAL
         .freq_control_mask = 0xf,
-        .core_limit_temp_degC = 80,
-        .core_temp_hysteresis_degC = 10,
-        .core_control_mask = 0xe,
+        .core_limit_temp_degC = 65,
 #endif
-        .temp_hysteresis_degC = 10,
-        .freq_step = 2,
 };
 
 #ifdef CONFIG_MSM_FAKE_BATTERY
@@ -3099,13 +3086,13 @@ static int k2_ul_g_sensor_power_LPM(int on)
 
 	mutex_lock(&sensor_lock);
 
-	//printk(KERN_DEBUG "[GSNR][BMA250] %s, on = %d\n", __func__, on);
+	pr_debug(KERN_DEBUG "[GSNR][BMA250] %s, on = %d\n", __func__, on);
 
 	if (g_sensor_reg_l9 == NULL) {
 		g_sensor_reg_l9 = regulator_get(NULL, "8038_l9_g_sensor");
 		if (IS_ERR(g_sensor_reg_l9)) {
-			/*pr_err("[GSNR][BMA250] %s: Unable to get"
-				" '8038_l9_g_sensor' \n", __func__);*/
+			pr_err("[GSNR][BMA250] %s: Unable to get"
+				" '8038_l9_g_sensor' \n", __func__);
 			mutex_unlock(&sensor_lock);
 			return -ENODEV;
 		}
@@ -3114,23 +3101,23 @@ static int k2_ul_g_sensor_power_LPM(int on)
 	if (on) {
 		rc = regulator_set_optimum_mode(g_sensor_reg_l9, 100);
 		if (rc < 0) {
-			/*pr_err("[GSNR][BMA250] set_optimum_mode L9 to LPM"
-				" failed, rc = %d\n", rc);*/
+			pr_err("[GSNR][BMA250] set_optimum_mode L9 to LPM"
+				" failed, rc = %d\n", rc);
 			mutex_unlock(&sensor_lock);
 			return -EINVAL;
 		}
-		/*printk(KERN_DEBUG "[GSNR][BMA250] %s, Set to Low Power"
-			" Mode\n", __func__);*/
+		pr_debug(KERN_DEBUG "[GSNR][BMA250] %s, Set to Low Power"
+			" Mode\n", __func__);
 	} else {
 		rc = regulator_set_optimum_mode(g_sensor_reg_l9, 100000);
 		if (rc < 0) {
-			/*pr_err("[GSNR][BMA250] set_optimum_mode L9 to"
-				" Normal mode failed, rc = %d\n", rc);*/
+			pr_err("[GSNR][BMA250] set_optimum_mode L9 to"
+				" Normal mode failed, rc = %d\n", rc);
 			mutex_unlock(&sensor_lock);
 			return -EINVAL;
 		}
-		/*printk(KERN_DEBUG "[GSNR][BMA250] %s, Set to Normal Mode\n",
-			__func__);*/
+		pr_debug(KERN_DEBUG "[GSNR][BMA250] %s, Set to Normal Mode\n",
+			__func__);
 
 	}
 	mutex_unlock(&sensor_lock);
@@ -3149,13 +3136,13 @@ static int k2_ul_compass_power_LPM(int on)
 
 	mutex_lock(&sensor_lock);
 
-	//printk(KERN_DEBUG "[COMP][AKM8975] %s, on = %d\n", __func__, on);
+	pr_debug(KERN_DEBUG "[COMP][AKM8975] %s, on = %d\n", __func__, on);
 
 	if (compass_reg_l9 == NULL) {
 		compass_reg_l9 = regulator_get(NULL, "8038_l9_compass");
 		if (IS_ERR(compass_reg_l9)) {
-			/*pr_err("[GSNR][BMA250] %s: Unable to get"
-				" '8038_l9_compass' \n", __func__);*/
+			pr_err("[GSNR][BMA250] %s: Unable to get"
+				" '8038_l9_compass' \n", __func__);
 			mutex_unlock(&sensor_lock);
 			return -ENODEV;
 		}
@@ -3164,23 +3151,23 @@ static int k2_ul_compass_power_LPM(int on)
 	if (on) {
 		rc = regulator_set_optimum_mode(compass_reg_l9, 100);
 		if (rc < 0) {
-			/*pr_err("[COMP][AKM8975] set_optimum_mode L9 to LPM"
-				" failed, rc = %d\n", rc);*/
+			pr_err("[COMP][AKM8975] set_optimum_mode L9 to LPM"
+				" failed, rc = %d\n", rc);
 			mutex_unlock(&sensor_lock);
 			return -EINVAL;
 		}
-		/*printk(KERN_DEBUG "[COMP][AKM8975] %s, Set to Low Power"
-			" Mode\n", __func__);*/
+		pr_debug(KERN_DEBUG "[COMP][AKM8975] %s, Set to Low Power"
+			" Mode\n", __func__);
 	} else {
 		rc = regulator_set_optimum_mode(compass_reg_l9, 100000);
 		if (rc < 0) {
-			/*pr_err("[COMP][AKM8975] set_optimum_mode L9 to "
-				"Normal mode failed, rc = %d\n", rc);*/
+			pr_err("[COMP][AKM8975] set_optimum_mode L9 to "
+				"Normal mode failed, rc = %d\n", rc);
 			mutex_unlock(&sensor_lock);
 			return -EINVAL;
 		}
-		/*printk(KERN_DEBUG "[COMP][AKM8975] %s, Set to Normal Mode\n",
-			__func__);*/
+		pr_debug(KERN_DEBUG "[COMP][AKM8975] %s, Set to Normal Mode\n",
+			__func__);
 
 	}
 	mutex_unlock(&sensor_lock);
@@ -3271,7 +3258,7 @@ static void __init register_i2c_devices(void)
 	else if (machine_is_msm8930_mtp() || machine_is_msm8627_mtp())
 		mach_mask = I2C_FFA;
 	else
-		/*pr_err("unmatched machine ID in register_i2c_devices\n")*/;
+		pr_err("unmatched machine ID in register_i2c_devices\n");
 
 	
 	for (i = 0; i < ARRAY_SIZE(msm8960_i2c_devices); ++i) {
@@ -3313,7 +3300,7 @@ __setup("androidboot.dq=", check_dq_setup);
 static void __init k2_ul_init(void)
 {
 	if (meminfo_init(SYS_MEMORY, SZ_256M) < 0)
-		/*pr_err("meminfo_init() failed!\n")*/;
+		pr_err("meminfo_init() failed!\n");
 
 	msm_tsens_early_init(&msm_tsens_pdata);
 	msm_thermal_init(&msm_thermal_pdata);
@@ -3323,7 +3310,7 @@ static void __init k2_ul_init(void)
 
 	regulator_suppress_info_printing();
 	if (msm_xo_init())
-		/*pr_err("Failed to initialize XO votes\n")*/;
+		pr_err("Failed to initialize XO votes\n");
 
 	platform_device_register(&msm8930_device_rpm_regulator);
 
@@ -3389,7 +3376,7 @@ static void __init k2_ul_init(void)
 	
 	
 	if (k2_ul_init_mmc() != 0)
-		/*printk(KERN_ERR "%s: Unable to initialize MMC (SDCC4)\n", __func__)*/;
+		pr_debug(KERN_ERR "%s: Unable to initialize MMC (SDCC4)\n", __func__);
 	
 	syn_init_vkeys_k2();
 
@@ -3403,10 +3390,6 @@ static void __init k2_ul_init(void)
 	change_memory_power = &msm8930_change_memory_power;
 	BUG_ON(msm_pm_boot_init(&msm_pm_boot_pdata));
 	msm_pm_init_sleep_status_data(&msm_pm_slp_sts_data);
-
-#ifdef CONFIG_CPU_FREQ_GOV_ONDEMAND_2_PHASE
-	set_two_phase_freq(918000);
-#endif
 
 	k2_ul_init_keypad();
 	if ((get_kernel_flag() & KERNEL_FLAG_PM_MONITOR) ||
